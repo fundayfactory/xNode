@@ -46,6 +46,9 @@ namespace XNodeEditor {
         private Vector2 lastMousePosition;
         private float dragThreshold = 1f;
 
+        private bool isMouseDownEvent;
+        private bool isMouseDownEventUsed;
+
         public void Controls() {
             wantsMouseMove = true;
             Event e = Event.current;
@@ -158,6 +161,7 @@ namespace XNodeEditor {
                     Repaint();
                     if (e.button == 0) {
                         draggedOutputReroutes.Clear();
+                        isMouseDownEvent = true;
 
                         if (IsHoveringPort) {
                             if (hoveredPort.IsOutput) {
@@ -251,8 +255,9 @@ namespace XNodeEditor {
                         } else if (!IsHoveringNode) {
                             // If click outside node, release field focus
                             if (!isPanning) {
-                                EditorGUI.FocusTextInControl(null);
-                                EditorGUIUtility.editingTextField = false;
+                                // AE: Moved to PostControls, since it removes all controls from custom text and object fields in OnGUI
+                                // EditorGUI.FocusTextInControl(null);
+                                // EditorGUIUtility.editingTextField = false;
                             }
                             if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
                         }
@@ -357,6 +362,38 @@ namespace XNodeEditor {
                     if (e.rawType == EventType.MouseUp && currentActivity == NodeActivity.DragGrid) {
                         Repaint();
                         currentActivity = NodeActivity.Idle;
+                    }
+                    break;
+            }
+        }
+
+        private void PostControls()
+        {
+            // AE: Added this to help with deselect and also allowing for object and text fields in OnGUI
+            Event e = Event.current;
+
+            switch (e.type) {
+                case EventType.MouseDown:
+                    if (e.button == 0) {
+                        isMouseDownEvent = false;
+                        isMouseDownEventUsed = false;
+                    }
+                    break;
+                case EventType.MouseUp:
+                    if (e.button == 0) {
+                        isMouseDownEvent = false;
+                        if (!isMouseDownEventUsed && !IsDraggingPort && currentActivity != NodeActivity.DragNode && !IsHoveringNode && !isPanning) {
+                            EditorGUI.FocusTextInControl(null);
+                            EditorGUIUtility.editingTextField = false;
+                            e.Use();
+                        }
+                    }
+                    break;
+                case EventType.Layout:
+                case EventType.Used:
+                    if (isMouseDownEvent) {
+                        isMouseDownEvent = false;
+                        isMouseDownEventUsed = true;
                     }
                     break;
             }

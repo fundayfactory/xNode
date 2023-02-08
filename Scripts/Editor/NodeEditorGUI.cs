@@ -41,6 +41,7 @@ namespace XNodeEditor {
                 onLateGUI = null;
             }
 
+            PostControls();
             GUI.matrix = m;
         }
 
