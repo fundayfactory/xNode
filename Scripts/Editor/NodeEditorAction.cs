@@ -385,6 +385,7 @@ namespace XNodeEditor {
                         if (!isMouseDownEventUsed && !IsDraggingPort && currentActivity != NodeActivity.DragNode && !IsHoveringNode && !isPanning) {
                             EditorGUI.FocusTextInControl(null);
                             EditorGUIUtility.editingTextField = false;
+                            graphEditor.OnDeselect();
                             e.Use();
                         }
                     }

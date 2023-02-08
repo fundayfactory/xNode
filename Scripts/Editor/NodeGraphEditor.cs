@@ -209,6 +209,10 @@ namespace XNodeEditor {
             if (GetType() != typeof(NodeGraphEditor)) Debug.Log("No OnDropObjects override defined for " + GetType());
         }
 
+        /// <summary> EventType.MouseUp is invoked and node, focused, and text fields are cleared</summary>
+        public virtual void OnDeselect() {
+        }
+
         /// <summary> Create a node and save it in the graph asset </summary>
         public virtual XNode.Node CreateNode(Type type, Vector2 position) {
             Undo.RecordObject(target, "Create Node");
