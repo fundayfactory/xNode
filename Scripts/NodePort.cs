@@ -19,7 +19,7 @@ namespace XNode {
             }
         }
 
-        public IO direction { 
+        public IO direction {
             get { return _direction; }
             internal set { _direction = value; }
         }
@@ -298,12 +298,12 @@ namespace XNode {
                     if (port.connections[i].Port == this) {
                         port.connections.RemoveAt(i);
                         // Trigger OnRemoveConnection from this side port
-                        port.node.OnRemoveConnection(port);
+                        port.node.OnRemoveConnection(port, this);
                     }
                 }
             }
             // Trigger OnRemoveConnection
-            node.OnRemoveConnection(this);
+            node.OnRemoveConnection(this, port);
         }
 
         /// <summary> Disconnect this port from another port </summary>
@@ -317,8 +317,8 @@ namespace XNode {
             connections.RemoveAt(i);
 
             // Trigger OnRemoveConnection
-            node.OnRemoveConnection(this);
-            if (otherPort != null) otherPort.node.OnRemoveConnection(otherPort);
+            node.OnRemoveConnection(this, otherPort);
+            if (otherPort != null) otherPort.node.OnRemoveConnection(otherPort, this);
         }
 
         public void ClearConnections() {

@@ -255,7 +255,7 @@ namespace XNode {
 
         /// <summary> Called after a connection is removed from this port </summary>
         /// <param name="port">Output or Input</param>
-        public virtual void OnRemoveConnection(NodePort port) { }
+        public virtual void OnRemoveConnection(NodePort port, NodePort otherPort) { }
 
         /// <summary> Disconnect everything from this node </summary>
         public void ClearConnections() {
@@ -406,7 +406,7 @@ namespace XNode {
 
             public void OnAfterDeserialize() {
                 this.Clear();
-#if UNITY_2021_3_OR_NEWER                
+#if UNITY_2021_3_OR_NEWER
                 this.EnsureCapacity(keys.Count);
 #endif
 
