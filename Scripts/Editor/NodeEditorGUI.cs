@@ -16,24 +16,28 @@ namespace XNodeEditor {
         private List<XNode.Node> culledNodes;
         /// <summary> 19 if docked, 22 if not </summary>
         private int topPadding { get { return isDocked() ? 19 : 22; } }
+        private Rect prevToolbarRect;
+
         /// <summary> Executed after all other window GUI. Useful if Zoom is ruining your day. Automatically resets after being run.</summary>
         public event Action onLateGUI;
 
-
         protected virtual void OnGUI() {
-            Event e = Event.current;
+            if (graph == null)
+                return;
+
             Matrix4x4 m = GUI.matrix;
-            if (graph == null) return;
             ValidateGraphEditor();
             Controls();
 
             DrawGrid(position, zoom, panOffset);
+            graphEditor.OnPreGUI();
             DrawConnections();
+            graphEditor.OnPostConnectionsGUI();
             DrawDraggedConnection();
             DrawNodes();
             DrawSelectionBox();
-            DrawTooltip();
             graphEditor.OnGUI();
+            DrawTooltip();
 
             // Run and reset onLateGUI
             if (onLateGUI != null) {
@@ -43,6 +47,9 @@ namespace XNodeEditor {
 
             PostControls();
             GUI.matrix = m;
+
+            DrawToolbar();
+            DrawPanels();
         }
 
         public static void BeginZoomed(Rect rect, float zoom, float topPadding) {
@@ -408,6 +415,104 @@ namespace XNodeEditor {
             Rect rect = new Rect(Event.current.mousePosition - (size), size);
             EditorGUI.LabelField(rect, content, NodeEditorResources.styles.tooltip);
             Repaint();
+        }
+
+        private void DrawToolbar() {
+            if (graphEditor == null)
+                return;
+            if (graphEditor.toolbarOptionsLeft.Count == 0 && graphEditor.toolbarOptionsRight.Count == 0)
+                return;
+
+            GUI.EndClip();
+            GUI.BeginClip(new Rect(0f, topPadding, position.width, position.height));
+            NodeEditorGUILayout.BeginToolbar(GetToolbarRect());
+
+            for (var i = 0; i < graphEditor.toolbarOptionsLeft.Count; i++) {
+                DrawToolbarOption(graphEditor.toolbarOptionsLeft[i]);
+            }
+
+            GUILayout.FlexibleSpace();
+
+            for (var i = 0; i < graphEditor.toolbarOptionsRight.Count; i++) {
+                DrawToolbarOption(graphEditor.toolbarOptionsRight[i]);
+            }
+
+            NodeEditorGUILayout.EndToolbar();
+        }
+
+        private Rect GetToolbarRect()
+        {
+            if (graphEditor.toolbarOptionsLeft.Count == 0 && graphEditor.toolbarOptionsRight.Count == 0)
+                return Rect.zero;
+
+            return new Rect(0f, 0f, position.width, 22f);
+        }
+
+        private void DrawToolbarOption(NodeGraphEditor.ToolbarOption option)
+        {
+            bool prevEnabled = GUI.enabled;
+            GUI.enabled = prevEnabled && (option.active == null || option.active.Invoke());
+
+            if (option.drawer != null && option.drawer.Invoke()) {
+                try {
+                    option.action?.Invoke();
+                }
+                catch (Exception e) {
+                    Debug.LogException(e);
+                }
+            }
+
+            GUI.enabled = prevEnabled;
+        }
+
+        private void DrawPanels() {
+            if (graphEditor == null)
+                return;
+
+            float padding = topPadding + GetToolbarRect().height;
+
+            GUI.EndClip();
+            GUI.BeginClip(new Rect(0f, padding, position.width, position.height));
+
+            GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical();
+
+            for (var i = 0; i < graphEditor.panelsLeft.Count; i++) {
+                NodeGraphEditor.Panel panel = graphEditor.panelsLeft[i];
+                panel.drawer.Set(graphEditor, graphEditor.target);
+
+                if (!panel.drawer.IsVisible())
+                    continue;
+
+                GUILayout.BeginVertical(GUILayout.MaxWidth(panel.drawer.CalculateWidth()));
+                panel.drawer.OnGUI();
+                GUILayout.EndVertical();
+
+                if (Event.current.type == EventType.Repaint)
+                    panel.rect = GUILayoutUtility.GetLastRect();
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginVertical();
+
+            for (var i = 0; i < graphEditor.panelsRight.Count; i++) {
+                NodeGraphEditor.Panel panel = graphEditor.panelsRight[i];
+                panel.drawer.Set(graphEditor, graphEditor.target);
+
+                if (!panel.drawer.IsVisible())
+                    continue;
+
+                GUILayout.BeginVertical(GUILayout.MaxWidth(panel.drawer.CalculateWidth()));
+                panel.drawer.OnGUI();
+                GUILayout.EndVertical();
+
+                if (Event.current.type == EventType.Repaint)
+                    panel.rect = GUILayoutUtility.GetLastRect();
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
         }
     }
 }

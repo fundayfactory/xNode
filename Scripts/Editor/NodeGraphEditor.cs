@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -15,10 +16,34 @@ namespace XNodeEditor {
         /// <summary> Are we currently renaming a node? </summary>
         protected bool isRenaming;
 
+        internal readonly List<ToolbarOption> toolbarOptionsLeft = new();
+        internal readonly List<ToolbarOption> toolbarOptionsRight = new();
+        internal readonly List<Panel> panelsLeft = new();
+        internal readonly List<Panel> panelsRight = new();
+
+        /// <summary> Called before any other GUI has been drawn</summary>
+        public virtual void OnPreGUI() { }
+
+        /// <summary> Called right after all other GUI has been drawn</summary>
         public virtual void OnGUI() { }
 
-        /// <summary> Called when opened by NodeEditorWindow </summary>
+        /// <summary> Called right after drawing connection/noodles</summary>
+        public virtual void OnPostConnectionsGUI() { }
+
+        /// <summary> Called when opened by NodeEditorWindow</summary>
         public virtual void OnOpen() { }
+
+        /// <summary> Called when opened by NodeEditorWindow</summary>
+        public virtual void OnCreateToolbar() {
+            toolbarOptionsLeft.Clear();
+            toolbarOptionsRight.Clear();
+        }
+
+        /// <summary> Called when opened by NodeEditorWindow</summary>
+        public virtual void OnCreatePanels() {
+            panelsLeft.Clear();
+            panelsRight.Clear();
+        }
 
         /// <summary> Called when NodeEditorWindow gains focus </summary>
         public virtual void OnWindowFocus() { }
@@ -268,6 +293,20 @@ namespace XNodeEditor {
             if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
         }
 
+        protected void AddToolbarOption(bool left, Func<bool> drawer, Action action = null, Func<bool> active = null) {
+            if (left)
+                toolbarOptionsLeft.Add(new ToolbarOption(drawer, action, active));
+            else
+                toolbarOptionsRight.Add(new ToolbarOption(drawer, action, active));
+        }
+
+        protected void AddPanel(bool left, INodeEditorPanel panel) {
+            if (left)
+                panelsLeft.Add(new Panel(panel));
+            else
+                panelsRight.Add(new Panel(panel));
+        }
+
         [AttributeUsage(AttributeTargets.Class)]
         public class CustomNodeGraphEditorAttribute : Attribute,
         XNodeEditor.Internal.NodeEditorBase<NodeGraphEditor, NodeGraphEditor.CustomNodeGraphEditorAttribute, XNode.NodeGraph>.INodeEditorAttrib {
@@ -283,6 +322,28 @@ namespace XNodeEditor {
 
             public Type GetInspectedType() {
                 return inspectedType;
+            }
+        }
+
+        internal sealed class ToolbarOption {
+            public readonly Func<bool> drawer;
+            public readonly Action action;
+            public readonly Func<bool> active;
+
+            public ToolbarOption(Func<bool> drawer, Action action, Func<bool> active) {
+                this.drawer = drawer;
+                this.action = action;
+                this.active = active;
+            }
+        }
+
+        internal sealed class Panel {
+            public readonly INodeEditorPanel drawer;
+            public Rect rect;
+
+            public Panel(INodeEditorPanel drawer) {
+                this.drawer = drawer;
+                rect = Rect.zero;
             }
         }
     }

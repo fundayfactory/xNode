@@ -81,10 +81,10 @@ namespace XNodeEditor {
                 graphEditor.OnWindowFocus();
                 if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
             }
-            
+
             dragThreshold = Math.Max(1f, Screen.width / 1000f);
         }
-        
+
         void OnLostFocus() {
             if (graphEditor != null) graphEditor.OnWindowFocusLost();
         }
@@ -109,6 +109,8 @@ namespace XNodeEditor {
             if (this.graphEditor != graphEditor && graphEditor != null) {
                 this.graphEditor = graphEditor;
                 graphEditor.OnOpen();
+                graphEditor.OnCreateToolbar();
+                graphEditor.OnCreatePanels();
             }
         }
 

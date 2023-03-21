@@ -577,5 +577,28 @@ namespace XNodeEditor {
             if (onCreation != null) onCreation(list);
             return list;
         }
+
+        public static void BeginToolbar(Rect rect)
+        {
+            GUILayout.BeginArea(rect, EditorStyles.toolbar);
+            GUILayout.BeginHorizontal();
+        }
+
+        public static void EndToolbar()
+        {
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        public static bool DrawToolbarButton(string name)
+        {
+            return GUILayout.Button(name, EditorStyles.toolbarButton);
+        }
+
+        public static bool DrawToolbarLabel(string label)
+        {
+            GUILayout.Label(label, EditorStyles.whiteLabel);
+            return false;
+        }
     }
 }

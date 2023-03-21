@@ -50,8 +50,13 @@ namespace XNodeEditor {
         private bool isMouseDownEventUsed;
 
         public void Controls() {
-            wantsMouseMove = true;
             Event e = Event.current;
+
+            if (IsInputBlocked(e.mousePosition))
+                return;
+
+            wantsMouseMove = true;
+
             switch (e.type) {
                 case EventType.DragUpdated:
                 case EventType.DragPerform:
@@ -372,6 +377,9 @@ namespace XNodeEditor {
             // AE: Added this to help with deselect and also allowing for object and text fields in OnGUI
             Event e = Event.current;
 
+            if (IsInputBlocked(e.mousePosition))
+                return;
+
             switch (e.type) {
                 case EventType.MouseDown:
                     if (e.button == 0) {
@@ -398,6 +406,26 @@ namespace XNodeEditor {
                     }
                     break;
             }
+        }
+
+        private bool IsInputBlocked(Vector2 mousePosition)
+        {
+            if (graphEditor == null)
+                return false;
+            if (GetToolbarRect().Contains(mousePosition))
+                return true;
+
+            for (var i = 0; i < graphEditor.panelsLeft.Count; i++) {
+                if (graphEditor.panelsLeft[i].rect.Contains(mousePosition))
+                    return true;
+            }
+
+            for (var i = 0; i < graphEditor.panelsRight.Count; i++) {
+                if (graphEditor.panelsRight[i].rect.Contains(mousePosition))
+                    return true;
+            }
+
+            return false;
         }
 
         private void RecalculateDragOffsets(Event current) {
