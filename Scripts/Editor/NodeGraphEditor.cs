@@ -151,8 +151,9 @@ namespace XNodeEditor {
             return NodeEditorPreferences.GetSettings().noodleThickness;
         }
 
-        public virtual NoodlePath GetNoodlePath(XNode.NodePort output, XNode.NodePort input) {
-            return NodeEditorPreferences.GetSettings().noodlePath;
+        public virtual INoodleDrawer GetNoodleDrawer(XNode.NodePort output, XNode.NodePort input)
+        {
+            return NodeEditorPreferences.GetSettings().NoodleDrawer;
         }
 
         public virtual NoodleStroke GetNoodleStroke(XNode.NodePort output, XNode.NodePort input) {

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
+using XNodeEditor.Noodles;
 
 namespace XNodeEditor {
-    public enum NoodlePath { Curvy, Straight, Angled, ShaderLab }
     public enum NoodleStroke { Full, Dashed }
 
     public static class NodeEditorPreferences {
@@ -17,6 +18,10 @@ namespace XNodeEditor {
 
         private static Dictionary<Type, Color> typeColors = new Dictionary<Type, Color>();
         private static Dictionary<string, Settings> settings = new Dictionary<string, Settings>();
+
+        private static List<Type> noodleDrawerTypes;
+        private static List<INoodleDrawer> noodleDrawerInstances;
+        private static string[] noodleDrawerNames;
 
         [System.Serializable]
         public class Settings : ISerializationCallbackReceiver {
@@ -43,7 +48,6 @@ namespace XNodeEditor {
             public bool portTooltips = true;
             [SerializeField] private string typeColorsData = "";
             [NonSerialized] public Dictionary<string, Color> typeColors = new Dictionary<string, Color>();
-            [FormerlySerializedAs("noodleType")] public NoodlePath noodlePath = NoodlePath.Curvy;
             public float noodleThickness = 2f;
 
             public NoodleStroke noodleStroke = NoodleStroke.Full;
@@ -60,6 +64,22 @@ namespace XNodeEditor {
                 get {
                     if (_crossTexture == null) _crossTexture = NodeEditorResources.GenerateCrossTexture(gridLineColor);
                     return _crossTexture;
+                }
+            }
+
+            [SerializeField, SerializeReference]
+            private INoodleDrawer _noodleDrawer;
+
+            public INoodleDrawer NoodleDrawer
+            {
+                get
+                {
+                    return _noodleDrawer ??= new CurvyNoodleDrawer();
+                }
+                set
+                {
+                    if (value != null)
+                        _noodleDrawer = value;
                 }
             }
 
@@ -164,7 +184,7 @@ namespace XNodeEditor {
             EditorGUILayout.LabelField("Node", EditorStyles.boldLabel);
             settings.tintColor = EditorGUILayout.ColorField("Tint", settings.tintColor);
             settings.highlightColor = EditorGUILayout.ColorField("Selection", settings.highlightColor);
-            settings.noodlePath = (NoodlePath) EditorGUILayout.EnumPopup("Noodle path", (Enum) settings.noodlePath);
+            DrawNoodleDrawerSelection(settings);
             settings.noodleThickness = EditorGUILayout.FloatField(new GUIContent("Noodle thickness", "Noodle Thickness of the node connections"), settings.noodleThickness);
             settings.noodleStroke = (NoodleStroke) EditorGUILayout.EnumPopup("Noodle stroke", (Enum) settings.noodleStroke);
             settings.portTooltips = EditorGUILayout.Toggle("Port Tooltips", settings.portTooltips);
@@ -177,6 +197,48 @@ namespace XNodeEditor {
                 NodeEditorWindow.RepaintAll();
             }
             EditorGUILayout.Space();
+        }
+
+        private static void DrawNoodleDrawerSelection(Settings settings)
+        {
+            if (noodleDrawerInstances == null)
+            {
+                TypeCache.TypeCollection types = TypeCache.GetTypesDerivedFrom<INoodleDrawer>();
+                noodleDrawerTypes = new List<Type>();
+                noodleDrawerInstances = new List<INoodleDrawer>();
+                var tempDrawerNames = new List<string>();
+
+                for (var i = 0; i < types.Count; i++)
+                {
+                    Type type = types[i];
+
+                    if (type.IsAbstract || type.IsInterface || !type.IsSerializable)
+                        continue;
+
+                    try
+                    {
+                        if (FormatterServices.GetUninitializedObject(type) is INoodleDrawer instance)
+                        {
+                            noodleDrawerInstances.Add(instance);
+                            tempDrawerNames.Add(instance.Name);
+                            noodleDrawerTypes.Add(type);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
+
+                noodleDrawerNames = tempDrawerNames.ToArray();
+            }
+
+            Type selectedType = settings.NoodleDrawer?.GetType();
+            int selectedIndex = noodleDrawerTypes.IndexOf(selectedType);
+            int newSelectedIndex = EditorGUILayout.Popup("Noodle path", selectedIndex, noodleDrawerNames);
+
+            if (newSelectedIndex != -1 && selectedIndex != newSelectedIndex)
+                settings.NoodleDrawer = noodleDrawerInstances[newSelectedIndex];
         }
 
         private static void TypeColorsGUI(string key, Settings settings) {

@@ -542,7 +542,7 @@ namespace XNodeEditor {
             if (IsDraggingPort) {
                 Gradient gradient = graphEditor.GetNoodleGradient(draggedOutput, null);
                 float thickness = graphEditor.GetNoodleThickness(draggedOutput, null);
-                NoodlePath path = graphEditor.GetNoodlePath(draggedOutput, null);
+                INoodleDrawer drawer = graphEditor.GetNoodleDrawer(draggedOutput, null);
                 NoodleStroke stroke = graphEditor.GetNoodleStroke(draggedOutput, null);
 
                 Rect fromRect;
@@ -555,7 +555,7 @@ namespace XNodeEditor {
                 if (draggedOutputTarget != null) gridPoints.Add(portConnectionPoints[draggedOutputTarget].center);
                 else gridPoints.Add(WindowToGridPosition(Event.current.mousePosition));
 
-                DrawNoodle(gradient, path, stroke, thickness, gridPoints);
+                DrawNoodle(draggedOutput, null, gradient, drawer, stroke, thickness, gridPoints);
 
                 GUIStyle portStyle = NodeEditorWindow.current.graphEditor.GetPortStyle(draggedOutput);
                 Color bgcol = Color.black;
