@@ -294,8 +294,10 @@ namespace XNodeEditor {
 
                 //Get node position
                 Vector2 nodePos = GridToWindowPositionNoClipped(node.position);
+                nodePos.y += 8f;
 
                 GUILayout.BeginArea(new Rect(nodePos, new Vector2(nodeEditor.GetWidth(), 4000)));
+                GUILayout.Space(8f);
 
                 bool selected = selectionCache.Contains(graph.nodes[n]);
 
@@ -321,6 +323,9 @@ namespace XNodeEditor {
                 nodeEditor.OnHeaderGUI();
                 nodeEditor.OnBodyGUI();
 
+                GUILayout.EndVertical();
+                nodeEditor.OnVerticalPortsGUI(GetNodeSize(node));
+
                 //If user changed a value, notify other scripts through onUpdateNode
                 if (EditorGUI.EndChangeCheck()) {
                     if (NodeEditor.onUpdateNode != null) NodeEditor.onUpdateNode(node);
@@ -328,18 +333,15 @@ namespace XNodeEditor {
                     nodeEditor.serializedObject.ApplyModifiedProperties();
                 }
 
-                GUILayout.EndVertical();
-
                 //Cache data about the node for next frame
                 if (e.type == EventType.Repaint) {
                     Vector2 size = GUILayoutUtility.GetLastRect().size;
-                    if (nodeSizes.ContainsKey(node)) nodeSizes[node] = size;
-                    else nodeSizes.Add(node, size);
+                    SetNodeSize(node, size);
 
                     foreach (var kvp in NodeEditor.portPositions) {
                         Vector2 portHandlePos = kvp.Value;
                         portHandlePos += node.position;
-                        Rect rect = new Rect(portHandlePos.x - 8, portHandlePos.y - 8, 16, 16);
+                        Rect rect = new Rect(portHandlePos.x - 8, portHandlePos.y, 16, 16);
                         portConnectionPoints[kvp.Key] = rect;
                     }
                 }
@@ -391,8 +393,7 @@ namespace XNodeEditor {
             Vector2 nodePos = GridToWindowPositionNoClipped(node.position);
             if (nodePos.x / _zoom > position.width) return true; // Right
             else if (nodePos.y / _zoom > position.height) return true; // Bottom
-            else if (nodeSizes.ContainsKey(node)) {
-                Vector2 size = nodeSizes[node];
+            else if (TryGetNodeSize(node, out Vector2 size)) {
                 if (nodePos.x + size.x < 0) return true; // Left
                 else if (nodePos.y + size.y < 0) return true; // Top
             }
@@ -513,6 +514,20 @@ namespace XNodeEditor {
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
+        }
+
+        private Vector2 GetNodeSize(Node node) {
+            return nodeSizes.TryGetValue(node, out Vector2 size) ? size : Vector2.zero;
+        }
+
+        private bool TryGetNodeSize(Node node, out Vector2 size) {
+            return nodeSizes.TryGetValue(node, out size);
+        }
+
+        private void SetNodeSize(Node node, Vector2 size)
+        {
+            if (nodeSizes.ContainsKey(node)) nodeSizes[node] = size;
+            else nodeSizes.Add(node, size);
         }
     }
 }

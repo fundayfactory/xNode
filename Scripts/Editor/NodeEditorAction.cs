@@ -274,7 +274,7 @@ namespace XNodeEditor {
 
                             // Double click to center node
                             if (isDoubleClick) {
-                                Vector2 nodeDimension = nodeSizes.ContainsKey(hoveredNode) ? nodeSizes[hoveredNode] / 2 : Vector2.zero;
+                                Vector2 nodeDimension = GetNodeSize(hoveredNode) * 0.5f;
                                 panOffset = -hoveredNode.position - nodeDimension;
                             }
                         }
@@ -449,7 +449,7 @@ namespace XNodeEditor {
             var nodes = Selection.objects.Where(o => o is XNode.Node).Cast<XNode.Node>().ToList();
             if (nodes.Count > 0) {
                 Vector2 minPos = nodes.Select(x => x.position).Aggregate((x, y) => new Vector2(Mathf.Min(x.x, y.x), Mathf.Min(x.y, y.y)));
-                Vector2 maxPos = nodes.Select(x => x.position + (nodeSizes.ContainsKey(x) ? nodeSizes[x] : Vector2.zero)).Aggregate((x, y) => new Vector2(Mathf.Max(x.x, y.x), Mathf.Max(x.y, y.y)));
+                Vector2 maxPos = nodes.Select(x => x.position + GetNodeSize(x)).Aggregate((x, y) => new Vector2(Mathf.Max(x.x, y.x), Mathf.Max(x.y, y.y)));
                 panOffset = -(minPos + (maxPos - minPos) / 2f);
             } else {
                 zoom = 2;
@@ -478,7 +478,7 @@ namespace XNodeEditor {
             if (Selection.objects.Length == 1 && Selection.activeObject is XNode.Node) {
                 XNode.Node node = Selection.activeObject as XNode.Node;
                 Vector2 size;
-                if (nodeSizes.TryGetValue(node, out size)) {
+                if (TryGetNodeSize(node, out size)) {
                     RenamePopup.Show(Selection.activeObject, size.x);
                 } else {
                     RenamePopup.Show(Selection.activeObject);
@@ -609,9 +609,9 @@ namespace XNodeEditor {
             Vector2 nodePos = GridToWindowPosition(node.position);
             float width;
             Vector2 size;
-            if (nodeSizes.TryGetValue(node, out size)) width = size.x;
+            if (TryGetNodeSize(node, out size)) width = size.x;
             else width = 200;
-            Rect windowRect = new Rect(nodePos, new Vector2(width / zoom, 30 / zoom));
+            Rect windowRect = new Rect(new Vector2(nodePos.x, nodePos.y + 16), new Vector2(width / zoom, 30 / zoom));
             return windowRect.Contains(mousePos);
         }
 

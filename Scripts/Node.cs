@@ -273,22 +273,27 @@ namespace XNode {
             public bool dynamicPortList;
             public TypeConstraint typeConstraint;
             public bool showLabel;
+            public bool isVerticalAligned;
 
             /// <summary> Mark a serializable field as an input port. You can access this through <see cref="GetInputPort(string)"/> </summary>
             /// <param name="backingValue">Should we display the backing value for this port as an editor field? </param>
             /// <param name="connectionType">Should we allow multiple connections? </param>
             /// <param name="typeConstraint">Constrains which input connections can be made to this port </param>
             /// <param name="dynamicPortList">If true, will display a reorderable list of inputs instead of a single port. Will automatically add and display values for lists and arrays </param>
+            /// <param name="showLabel">If true, will display the property label next to the port </param>
+            /// <param name="isVerticalAligned">If true, will display the port at the bottom, but will not display backing or value types </param>
             public InputAttribute(ShowBackingValue backingValue = ShowBackingValue.Unconnected,
                                   ConnectionType connectionType = ConnectionType.Multiple,
                                   TypeConstraint typeConstraint = TypeConstraint.None,
                                   bool dynamicPortList = false,
-                                  bool showLabel = true) {
+                                  bool showLabel = true,
+                                  bool isVerticalAligned = false) {
                 this.backingValue = backingValue;
                 this.connectionType = connectionType;
                 this.dynamicPortList = dynamicPortList;
                 this.typeConstraint = typeConstraint;
                 this.showLabel = showLabel;
+                this.isVerticalAligned = isVerticalAligned;
             }
         }
 
@@ -302,22 +307,27 @@ namespace XNode {
             public bool dynamicPortList;
             public TypeConstraint typeConstraint;
             public bool showLabel;
+            public bool isVerticalAligned;
 
             /// <summary> Mark a serializable field as an output port. You can access this through <see cref="GetOutputPort(string)"/> </summary>
             /// <param name="backingValue">Should we display the backing value for this port as an editor field? </param>
             /// <param name="connectionType">Should we allow multiple connections? </param>
             /// <param name="typeConstraint">Constrains which input connections can be made from this port </param>
             /// <param name="dynamicPortList">If true, will display a reorderable list of outputs instead of a single port. Will automatically add and display values for lists and arrays </param>
+            /// <param name="showLabel">If true, will display the property label next to the port </param>
+            /// <param name="isVerticalAligned">If true, will display the port at the bottom, but will not display backing or value types </param>
             public OutputAttribute(ShowBackingValue backingValue = ShowBackingValue.Never,
                                    ConnectionType connectionType = ConnectionType.Multiple,
                                    TypeConstraint typeConstraint = TypeConstraint.None,
                                    bool dynamicPortList = false,
-                                   bool showLabel = true) {
+                                   bool showLabel = true,
+                                   bool isVerticalAligned = false) {
                 this.backingValue = backingValue;
                 this.connectionType = connectionType;
                 this.dynamicPortList = dynamicPortList;
                 this.typeConstraint = typeConstraint;
                 this.showLabel = showLabel;
+                this.isVerticalAligned = isVerticalAligned;
             }
 
             /// <summary> Mark a serializable field as an output port. You can access this through <see cref="GetOutputPort(string)"/> </summary>

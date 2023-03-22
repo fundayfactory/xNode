@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using XNode;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
@@ -16,7 +17,7 @@ namespace XNodeEditor {
     /// <summary> Base class to derive custom Node editors from. Use this to create your own custom inspectors and editors for your nodes. </summary>
     [CustomNodeEditor(typeof(XNode.Node))]
     public class NodeEditor : XNodeEditor.Internal.NodeEditorBase<NodeEditor, NodeEditor.CustomNodeEditorAttribute, XNode.Node> {
-
+        private static readonly string[] excludes = { "m_Script", "graph", "position", "ports" };
         /// <summary> Fires every whenever a node was modified through the editor </summary>
         public static Action<XNode.Node> onUpdateNode;
         public readonly static Dictionary<XNode.NodePort, Vector2> portPositions = new Dictionary<XNode.NodePort, Vector2>();
@@ -39,7 +40,6 @@ namespace XNodeEditor {
             // serializedObject.Update(); must go at the start of an inspector gui, and
             // serializedObject.ApplyModifiedProperties(); goes at the end.
             serializedObject.Update();
-            string[] excludes = { "m_Script", "graph", "position", "ports" };
 
 #if ODIN_INSPECTOR
             try
@@ -100,6 +100,50 @@ namespace XNodeEditor {
 #if ODIN_INSPECTOR
             inNodeEditor = false;
 #endif
+        }
+
+        public void OnVerticalPortsGUI(Vector2 size) {
+            GUILayout.BeginArea(new Rect(0f, 6f, size.x, size.y + 8f));
+            GUILayout.BeginHorizontal(GUIStyle.none);
+            GUILayout.FlexibleSpace();
+            DrawVerticalPorts(NodePort.IO.Input);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(size.y - 28f);
+            GUILayout.BeginHorizontal(GUIStyle.none);
+            GUILayout.FlexibleSpace();
+            DrawVerticalPorts(NodePort.IO.Output);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        private void DrawVerticalPorts(NodePort.IO direction) {
+            SerializedProperty iterator = serializedObject.GetIterator();
+            iterator.NextVisible(true);
+
+            while (iterator.NextVisible(false)) {
+                if (excludes.Contains(iterator.name)) continue;
+
+                var node = iterator.serializedObject.targetObject as Node;
+                if (node == null) continue;
+
+                NodePort port = node.GetPort(iterator.name);
+                if (port == null || port.direction != direction) continue;
+
+                if (direction == NodePort.IO.Input) {
+                    if (!NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), iterator.name, out Node.InputAttribute att)) continue;
+                    if (!att.isVerticalAligned) continue;
+                }
+                else {
+                    if (!NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), iterator.name, out Node.OutputAttribute att)) continue;
+                    if (!att.isVerticalAligned) continue;
+                }
+
+                Rect rect = NodeEditorGUILayout.DrawPortHandle(port);
+                portPositions[port] = rect.center;
+            }
         }
 
         public virtual int GetWidth() {
