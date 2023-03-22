@@ -309,11 +309,11 @@ namespace XNodeEditor {
                     GUI.color = nodeEditor.GetTint();
                     GUILayout.BeginVertical(style);
                     GUI.color = NodeEditorPreferences.GetSettings().highlightColor;
-                    GUILayout.BeginVertical(new GUIStyle(highlightStyle));
+                    GUILayout.BeginVertical(new GUIStyle(highlightStyle), GUILayout.MinHeight(64));
                 } else {
                     GUIStyle style = new GUIStyle(nodeEditor.GetBodyStyle());
                     GUI.color = nodeEditor.GetTint();
-                    GUILayout.BeginVertical(style);
+                    GUILayout.BeginVertical(style, GUILayout.MinHeight(64));
                 }
 
                 GUI.color = guiColor;

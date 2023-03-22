@@ -4,11 +4,9 @@ using UnityEditor;
 using UnityEngine;
 using XNode;
 
-namespace XNodeEditor
-{
+namespace XNodeEditor {
     [Serializable]
-    public sealed class AngledNoodleDrawer : INoodleDrawer
-    {
+    public sealed class AngledNoodleDrawer : INoodleDrawer {
         public string Name => "Angled";
 
         public void DrawNoodle(NodeGraph graph, NodePort outputPort, NodePort inputPort, float zoom, Gradient gradient,
@@ -19,9 +17,10 @@ namespace XNodeEditor
                 if (i == length - 1) continue; // Skip last index
 
                 if (gridPoints[i].x <= gridPoints[i + 1].x - (50 / zoom)) {
-                    float midpoint = (gridPoints[i].x + gridPoints[i + 1].x) * 0.5f;
                     Vector2 start_1 = gridPoints[i];
                     Vector2 end_1 = gridPoints[i + 1];
+
+                    float midpoint = (start_1.x + end_1.x) * 0.5f;
                     start_1.x = midpoint;
                     end_1.x = midpoint;
 

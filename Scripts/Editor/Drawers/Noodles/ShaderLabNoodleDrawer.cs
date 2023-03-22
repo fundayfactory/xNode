@@ -4,11 +4,9 @@ using UnityEditor;
 using UnityEngine;
 using XNode;
 
-namespace XNodeEditor
-{
+namespace XNodeEditor {
     [Serializable]
-    public sealed class ShaderLabNoodleDrawer : INoodleDrawer
-    {
+    public sealed class ShaderLabNoodleDrawer : INoodleDrawer {
         public string Name => "ShaderLab";
 
         public void DrawNoodle(NodeGraph graph, NodePort outputPort, NodePort inputPort, float zoom, Gradient gradient,
@@ -20,8 +18,8 @@ namespace XNodeEditor
             Vector2 end = gridPoints[length - 1];
 
             // Modify first and last point in array so we can loop trough them nicely.
-            gridPoints[0] = gridPoints[0] + Vector2.right * (20 / zoom);
-            gridPoints[length - 1] = gridPoints[length - 1] + Vector2.left * (20 / zoom);
+            gridPoints[0] += GetTangentForPort(outputPort) * (20 / zoom);
+            gridPoints[length - 1] += GetTangentForPort(inputPort) * (20 / zoom);
 
             // Draw first vertical lines going out from nodes
             Handles.color = gradient.Evaluate(0f);
@@ -61,6 +59,19 @@ namespace XNodeEditor
 
             gridPoints[0] = start;
             gridPoints[length - 1] = end;
+        }
+
+        private Vector2 GetTangentForPort(NodePort port) {
+            if (port == null)
+                return Vector2.left;
+
+            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName, out Node.InputAttribute attIn) && attIn.isVerticalAligned)
+                return Vector2.down;
+
+            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName, out Node.OutputAttribute attOut) && attOut.isVerticalAligned)
+                return Vector2.up;
+
+            return port.direction == NodePort.IO.Input ? Vector2.left : Vector2.right;
         }
     }
 }

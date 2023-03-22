@@ -142,7 +142,7 @@ namespace XNodeEditor {
                 }
 
                 Rect rect = NodeEditorGUILayout.DrawPortHandle(port);
-                portPositions[port] = rect.center;
+                portPositions[port] = new Vector2(rect.center.x, rect.center.y + 6f);
             }
         }
 

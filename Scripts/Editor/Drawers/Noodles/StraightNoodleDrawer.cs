@@ -4,11 +4,9 @@ using UnityEditor;
 using UnityEngine;
 using XNode;
 
-namespace XNodeEditor
-{
+namespace XNodeEditor {
     [Serializable]
-    public sealed class StraightNoodleDrawer : INoodleDrawer
-    {
+    public sealed class StraightNoodleDrawer : INoodleDrawer {
         public string Name => "Straight";
 
         public void DrawNoodle(NodeGraph graph, NodePort outputPort, NodePort inputPort, float zoom, Gradient gradient,

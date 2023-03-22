@@ -4,16 +4,14 @@ using UnityEditor;
 using UnityEngine;
 using XNode;
 
-namespace XNodeEditor.Noodles
-{
+namespace XNodeEditor.Noodles {
     [Serializable]
-    public sealed class CurvyNoodleDrawer : INoodleDrawer
-    {
+    public sealed class CurvyNoodleDrawer : INoodleDrawer {
         public string Name => "Curvy";
 
         public void DrawNoodle(NodeGraph graph, NodePort outputPort, NodePort inputPort, float zoom, Gradient gradient,
             NoodleStroke stroke, float thickness, List<Vector2> gridPoints) {
-            Vector2 outputTangent = Vector2.right;
+            Vector2 outputTangent = GetTangentForPort(outputPort);
             int length = gridPoints.Count;
 
             for (var i = 0; i < length - 1; i++) {
@@ -23,7 +21,7 @@ namespace XNodeEditor.Noodles
                 Vector2 point_b = gridPoints[i + 1];
                 float dist_ab = Vector2.Distance(point_a, point_b);
 
-                if (i == 0) outputTangent = zoom * dist_ab * 0.01f * Vector2.right;
+                if (i == 0) outputTangent = zoom * dist_ab * 0.01f * GetTangentForPort(outputPort);
 
                 if (i < length - 2) {
                     Vector2 point_c = gridPoints[i + 2];
@@ -38,7 +36,7 @@ namespace XNodeEditor.Noodles
                     inputTangent = p;
                 }
                 else {
-                    inputTangent = zoom * dist_ab * 0.01f * Vector2.left;
+                    inputTangent = zoom * dist_ab * 0.01f * GetTangentForPort(inputPort);
                 }
 
                 // Calculates the tangents for the bezier's curves.
@@ -71,6 +69,19 @@ namespace XNodeEditor.Noodles
 
                 outputTangent = -inputTangent;
             }
+        }
+
+        private Vector2 GetTangentForPort(NodePort port) {
+            if (port == null)
+                return Vector2.left;
+
+            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName, out Node.InputAttribute attIn) && attIn.isVerticalAligned)
+                return Vector2.down;
+
+            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName, out Node.OutputAttribute attOut) && attOut.isVerticalAligned)
+                return Vector2.up;
+
+            return port.direction == NodePort.IO.Input ? Vector2.left : Vector2.right;
         }
     }
 }
