@@ -613,6 +613,10 @@ namespace XNodeEditor {
             return GUILayout.Button(name, EditorStyles.toolbarButton);
         }
 
+        public static bool DrawToolbarToggle(string name, bool toggle) {
+            return GUILayout.Toggle(toggle, name, EditorStyles.toolbarButton) != toggle;
+        }
+
         public static bool DrawToolbarLabel(string label) {
             GUILayout.Label(label, EditorStyles.whiteLabel);
             return false;
