@@ -90,7 +90,7 @@ namespace XNodeEditor {
                 PointData pd2 = pointDatas[i+1];
 
                 if (pd1.distance <= halfLength && pd2.distance >= halfLength)
-                    center = pd1.point + (pd2.point - pd1.point) * (pd2.distance - pd1.distance) / (totalLength - pd1.distance);
+                     center = pd1.point + (pd2.point - pd1.point) * ((halfLength - pd1.distance) / (pd2.distance - pd1.distance));
 
                 pd1.normalizedDistance = pd2.distance / totalLength;
                 Handles.color = gradient.Evaluate(pd1.normalizedDistance);
