@@ -32,7 +32,7 @@ namespace XNodeEditor {
             DrawGrid(position, zoom, panOffset);
             graphEditor.OnPreGUI();
             DrawConnections();
-            graphEditor.OnPostConnectionsGUI();
+            DrawPostConnections();
             DrawDraggedConnection();
             DrawNodes();
             DrawSelectionBox();
@@ -56,8 +56,6 @@ namespace XNodeEditor {
             GUI.EndClip();
 
             GUIUtility.ScaleAroundPivot(Vector2.one / zoom, rect.size * 0.5f);
-            Vector4 padding = new Vector4(0, topPadding, 0, 0);
-            padding *= zoom;
             GUI.BeginClip(new Rect(-((rect.width * zoom) - rect.width) * 0.5f, -(((rect.height * zoom) - rect.height) * 0.5f) + (topPadding * zoom),
                 rect.width * zoom,
                 rect.height * zoom));
@@ -225,6 +223,21 @@ namespace XNodeEditor {
             }
             GUI.color = col;
             if (Event.current.type != EventType.Layout && currentActivity == NodeActivity.DragGrid) selectedReroutes = selection;
+        }
+
+        private void DrawPostConnections()
+        {
+            GUI.EndClip();
+            GUIUtility.ScaleAroundPivot(Vector2.one / zoom, position.size * 0.5f);
+            GUI.BeginClip(new Rect(-(position.width * zoom - position.width) * 0.5f,
+                -((position.height * zoom - position.height) * 0.5f) + topPadding * zoom,
+                position.width * zoom,
+                position.height * zoom));
+
+            graphEditor.OnPostConnectionsGUI();
+
+            GUIUtility.ScaleAroundPivot(Vector2.one * zoom, position.size * 0.5f);
+            GUI.matrix = Matrix4x4.TRS(Vector2.zero, Quaternion.identity, Vector3.one);
         }
 
         private void DrawNodes() {
