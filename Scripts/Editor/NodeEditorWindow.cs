@@ -13,6 +13,10 @@ namespace XNodeEditor {
         /// <summary> Stores node positions for all nodePorts. </summary>
         public Dictionary<XNode.NodePort, Rect> portConnectionPoints { get { return _portConnectionPoints; } }
         private Dictionary<XNode.NodePort, Rect> _portConnectionPoints = new Dictionary<XNode.NodePort, Rect>();
+        
+        public Dictionary<XNode.NodePort, Dictionary<XNode.NodePort, Vector2>> portConnectionLabelPoints { get { return _portConnectionLabelPoints; } }
+        private Dictionary<XNode.NodePort, Dictionary<XNode.NodePort, Vector2>> _portConnectionLabelPoints = new Dictionary<XNode.NodePort, Dictionary<XNode.NodePort, Vector2>>();
+        
         [SerializeField] private NodePortReference[] _references = new NodePortReference[0];
         [SerializeField] private Rect[] _rects = new Rect[0];
 

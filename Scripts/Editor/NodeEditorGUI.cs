@@ -542,5 +542,24 @@ namespace XNodeEditor {
             if (nodeSizes.ContainsKey(node)) nodeSizes[node] = size;
             else nodeSizes.Add(node, size);
         }
+
+        public bool TryGetConnectionLabelPoint(NodePort outPort, NodePort inPort, out Vector2 point)
+        {
+            if (portConnectionLabelPoints.TryGetValue(outPort, out var connections))
+                return connections.TryGetValue(inPort, out point);
+            point = Vector2.zero;
+            return false;
+        }
+
+        public void SetConnectionLabelPoint(NodePort outPort, NodePort inPort, Vector2 point)
+        {
+            if (!portConnectionLabelPoints.TryGetValue(outPort, out var connections))
+            {
+                connections = new Dictionary<NodePort, Vector2>();
+                portConnectionLabelPoints.Add(outPort, connections);
+            }
+
+            connections[inPort] = point;
+        }
     }
 }
