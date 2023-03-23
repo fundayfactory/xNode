@@ -98,7 +98,7 @@ namespace XNodeEditor {
             }
 
             if(outputPort != null && inputPort != null)
-                NodeEditorWindow.current.SetConnectionLabelPoint(outputPort, inputPort, center);
+                NodeEditorWindow.current.SetConnectionLabelPoint(outputPort, inputPort, NodeEditorWindow.current.WindowToGridPosition(center));
         }
     }
 }
