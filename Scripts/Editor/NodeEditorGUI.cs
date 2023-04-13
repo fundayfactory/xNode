@@ -227,17 +227,32 @@ namespace XNodeEditor {
 
         private void DrawPostConnections()
         {
+            Matrix4x4 m = GUI.matrix;
             GUI.EndClip();
-            GUIUtility.ScaleAroundPivot(Vector2.one / zoom, position.size * 0.5f);
-            GUI.BeginClip(new Rect(-(position.width * zoom - position.width) * 0.5f,
-                -((position.height * zoom - position.height) * 0.5f) + topPadding * zoom,
+
+            var scale = Vector2.one / zoom;
+            var pivotPoint = position.size * 0.5f;
+
+            var rectPos = new Vector2(
+                -(position.width * zoom - position.width) * 0.5f,
+                -((position.height * zoom - position.height) * 0.5f) + topPadding * zoom);
+            var rectSize = new Vector2(
                 position.width * zoom,
-                position.height * zoom));
+                position.height * zoom);
 
+
+            GUIUtility.ScaleAroundPivot(scale, pivotPoint);
+            GUI.BeginClip(new Rect(rectPos, rectSize));
             graphEditor.OnPostConnectionsGUI();
+            GUI.EndClip();
 
-            GUIUtility.ScaleAroundPivot(Vector2.one * zoom, position.size * 0.5f);
-            GUI.matrix = Matrix4x4.TRS(Vector2.zero, Quaternion.identity, Vector3.one);
+            rectPos = new Vector2(0f, topPadding);
+            rectSize = new Vector2(
+                position.width,
+                position.height);
+
+            GUI.matrix = m;
+            GUI.BeginClip(new Rect(rectPos, rectSize));
         }
 
         private void DrawNodes() {
