@@ -12,7 +12,7 @@ namespace XNodeEditor
         protected NodeGraph graph;
         protected bool defaultCollapsed;
 
-        public void Set(NodeGraphEditor editor, NodeGraph graph)
+        public virtual void Set(NodeGraphEditor editor, NodeGraph graph)
         {
             this.editor = editor;
             this.graph = graph;
