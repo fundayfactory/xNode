@@ -65,7 +65,7 @@ namespace XNodeEditor {
             GUIUtility.ScaleAroundPivot(Vector2.one * zoom, rect.size * 0.5f);
             Vector3 offset = new Vector3(
                 (((rect.width * zoom) - rect.width) * 0.5f),
-                (((rect.height * zoom) - rect.height) * 0.5f) + (-topPadding * zoom) + topPadding,
+                (((rect.height * zoom) - rect.height) * 0.5f) + (-topPadding * zoom) + topPadding + 4,
                 0);
             GUI.matrix = Matrix4x4.TRS(offset, Quaternion.identity, Vector3.one);
         }
@@ -240,16 +240,13 @@ namespace XNodeEditor {
                 position.width * zoom,
                 position.height * zoom);
 
-
             GUIUtility.ScaleAroundPivot(scale, pivotPoint);
             GUI.BeginClip(new Rect(rectPos, rectSize));
             graphEditor.OnPostConnectionsGUI();
             GUI.EndClip();
 
-            rectPos = new Vector2(0f, topPadding);
-            rectSize = new Vector2(
-                position.width,
-                position.height);
+            rectPos = new Vector2(0f, topPadding + 4);
+            rectSize = new Vector2(position.width, position.height);
 
             GUI.matrix = m;
             GUI.BeginClip(new Rect(rectPos, rectSize));

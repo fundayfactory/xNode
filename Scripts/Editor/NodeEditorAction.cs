@@ -227,6 +227,7 @@ namespace XNodeEditor {
                     }
                     break;
                 case EventType.MouseUp:
+                    Repaint();
                     if (e.button == 0) {
                         //Port drag release
                         if (IsDraggingPort) {
@@ -608,13 +609,17 @@ namespace XNodeEditor {
 
         bool IsHoveringTitle(XNode.Node node) {
             Vector2 mousePos = Event.current.mousePosition;
+
             //Get node position
             Vector2 nodePos = GridToWindowPosition(node.position);
             float width;
-            Vector2 size;
-            if (TryGetNodeSize(node, out size)) width = size.x;
-            else width = 200;
-            Rect windowRect = new Rect(new Vector2(nodePos.x, nodePos.y + 16), new Vector2(width / zoom, 30 / zoom));
+
+            if (TryGetNodeSize(node, out var size))
+                width = size.x;
+            else
+                width = 200;
+
+            Rect windowRect = new Rect(new Vector2(nodePos.x, nodePos.y - 4 + topPadding / zoom), new Vector2(width / zoom, 30 / zoom));
             return windowRect.Contains(mousePos);
         }
 
