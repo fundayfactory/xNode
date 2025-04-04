@@ -13,10 +13,10 @@ namespace XNodeEditor {
         /// <summary> Stores node positions for all nodePorts. </summary>
         public Dictionary<XNode.NodePort, Rect> portConnectionPoints { get { return _portConnectionPoints; } }
         private Dictionary<XNode.NodePort, Rect> _portConnectionPoints = new Dictionary<XNode.NodePort, Rect>();
-        
+
         public Dictionary<XNode.NodePort, Dictionary<XNode.NodePort, Vector2>> portConnectionLabelPoints { get { return _portConnectionLabelPoints; } }
         private Dictionary<XNode.NodePort, Dictionary<XNode.NodePort, Vector2>> _portConnectionLabelPoints = new Dictionary<XNode.NodePort, Dictionary<XNode.NodePort, Vector2>>();
-        
+
         [SerializeField] private NodePortReference[] _references = new NodePortReference[0];
         [SerializeField] private Rect[] _rects = new Rect[0];
 
@@ -209,10 +209,33 @@ namespace XNodeEditor {
         public static NodeEditorWindow Open(XNode.NodeGraph graph) {
             if (!graph) return null;
 
-            NodeEditorWindow w = GetWindow(typeof(NodeEditorWindow), false, "xNode", true) as NodeEditorWindow;
+            var appropriateWindowType = FindAppropriateWindowType(graph.GetType());
+
+            NodeEditorWindow w = GetWindow(appropriateWindowType, false, "xNode", true) as NodeEditorWindow;
             w.wantsMouseMove = true;
             w.graph = graph;
             return w;
+        }
+
+        private static Type FindAppropriateWindowType(Type graphType)
+        {
+            var appropriateWindowType = typeof(NodeEditorWindow);
+            var windowTypes = TypeCache.GetTypesDerivedFrom(appropriateWindowType);
+            for (int i = 0; i < windowTypes.Count; i++)
+            {
+                var windowType = windowTypes[i];
+                var attributes = windowType.GetCustomAttributes(false);
+                for (int j = 0; j < attributes.Length; j++)
+                {
+                    if (attributes[j] is CustomNodeGraphWindowAttribute windowAttribute && windowAttribute.GetInspectedType() == graphType)
+                    {
+                        appropriateWindowType = windowType;
+                    }
+                }
+
+            }
+
+            return appropriateWindowType;
         }
 
         /// <summary> Repaint all open NodeEditorWindows. </summary>
@@ -220,6 +243,22 @@ namespace XNodeEditor {
             NodeEditorWindow[] windows = Resources.FindObjectsOfTypeAll<NodeEditorWindow>();
             for (int i = 0; i < windows.Length; i++) {
                 windows[i].Repaint();
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class)]
+        public class CustomNodeGraphWindowAttribute : Attribute
+        {
+            private Type inspectedType;
+
+            public CustomNodeGraphWindowAttribute(Type inspectedType)
+            {
+                this.inspectedType = inspectedType;
+            }
+
+            public Type GetInspectedType()
+            {
+                return inspectedType;
             }
         }
     }
