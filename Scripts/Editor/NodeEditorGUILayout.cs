@@ -609,12 +609,12 @@ namespace XNodeEditor {
             GUILayout.EndArea();
         }
 
-        public static bool DrawToolbarButton(string name) {
-            return GUILayout.Button(name, EditorStyles.toolbarButton);
+        public static bool DrawToolbarButton(string name, params GUILayoutOption[] options) {
+            return GUILayout.Button(name, EditorStyles.toolbarButton, options);
         }
 
-        public static bool DrawToolbarToggle(string name, bool toggle) {
-            return GUILayout.Toggle(toggle, name, EditorStyles.toolbarButton) != toggle;
+        public static bool DrawToolbarToggle(string name, bool toggle, params GUILayoutOption[] options) {
+            return GUILayout.Toggle(toggle, name, EditorStyles.toolbarButton, options) != toggle;
         }
 
         public static bool DrawToolbarLabel(string label) {
