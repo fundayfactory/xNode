@@ -490,6 +490,15 @@ namespace XNodeEditor {
             }
         }
 
+        public void OpenScriptInIde(Node node) {
+            if (node != null) {
+                var script = MonoScript.FromScriptableObject(node);
+
+                if (script != null)
+                    AssetDatabase.OpenAsset(script);
+            }
+        }
+
         /// <summary> Draw this node on top of other nodes by placing it last in the graph.nodes list </summary>
         public void MoveNodeToTop(XNode.Node node) {
             int index;
