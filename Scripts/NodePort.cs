@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XNode {
     [Serializable]
-    public class NodePort {
+    public class NodePort : ISerializationCallbackReceiver {
         public enum IO { Input, Output }
 
         public int ConnectionCount { get { return connections.Count; } }
@@ -413,6 +413,16 @@ namespace XNode {
                 if (node == null || string.IsNullOrEmpty(fieldName)) return null;
                 return node.GetPort(fieldName);
             }
+        }
+
+        public void OnBeforeSerialize()
+        {
+            connections.Sort((c1,c2) => c1.node.position.y.CompareTo(c2.node.position.y));
+        }
+
+        public void OnAfterDeserialize()
+        {
+
         }
     }
 }
