@@ -209,9 +209,7 @@ namespace XNodeEditor {
         public static NodeEditorWindow Open(XNode.NodeGraph graph) {
             if (!graph) return null;
 
-            var appropriateWindowType = FindAppropriateWindowType(graph.GetType());
-
-            NodeEditorWindow w = GetWindow(appropriateWindowType, false, "xNode", true) as NodeEditorWindow;
+            NodeEditorWindow w = GetWindow<NodeEditorWindow>(false, "xNode", true);
             w.wantsMouseMove = true;
             w.graph = graph;
             return w;
