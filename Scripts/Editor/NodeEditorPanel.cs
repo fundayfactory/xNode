@@ -40,11 +40,16 @@ namespace XNodeEditor
                     SetCollapsed(!IsCollapsed());
             }
 
-            if (!IsCollapsed()) {
+            if (!IsCollapsed())
+            {
                 if (IsValidToDrawBody())
                     OnDraw();
                 else
                     OnDrawFailed();
+            }
+            else
+            {
+                OnDrawCollapsed();
             }
 
             EditorGUILayout.EndVertical();
@@ -57,6 +62,8 @@ namespace XNodeEditor
         protected abstract void OnDrawHeader();
         protected abstract void OnDraw();
         protected abstract void OnDrawFailed();
+
+        protected virtual void OnDrawCollapsed() { }
 
         protected bool IsCollapsed() {
             return EditorPrefs.GetBool(GetType().Name, defaultCollapsed);
