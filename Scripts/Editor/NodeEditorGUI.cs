@@ -50,6 +50,7 @@ namespace XNodeEditor {
 
             DrawToolbar();
             DrawPanels();
+            graphEditor.OnPostGUI();
         }
 
         public static void BeginZoomed(Rect rect, float zoom, float topPadding) {

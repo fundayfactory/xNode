@@ -27,6 +27,9 @@ namespace XNodeEditor {
         /// <summary> Called right after all other GUI has been drawn</summary>
         public virtual void OnGUI() { }
 
+        /// <summary> Call after all GUI-methods has been invoked</summary>
+        public virtual void OnPostGUI() { }
+
         /// <summary> Called right after drawing connection/noodles</summary>
         public virtual void OnPostConnectionsGUI() { }
 
