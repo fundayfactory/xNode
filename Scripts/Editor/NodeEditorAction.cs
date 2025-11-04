@@ -418,12 +418,12 @@ namespace XNodeEditor {
                 return true;
 
             for (var i = 0; i < graphEditor.panelsLeft.Count; i++) {
-                if (graphEditor.panelsLeft[i].rect.Contains(mousePosition))
+                if (graphEditor.panelsLeft[i].IsVisible() && graphEditor.panelsLeft[i].rect.Contains(mousePosition))
                     return true;
             }
 
             for (var i = 0; i < graphEditor.panelsRight.Count; i++) {
-                if (graphEditor.panelsRight[i].rect.Contains(mousePosition))
+                if (graphEditor.panelsRight[i].IsVisible() && graphEditor.panelsRight[i].rect.Contains(mousePosition))
                     return true;
             }
 

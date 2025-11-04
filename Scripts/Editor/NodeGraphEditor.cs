@@ -348,6 +348,11 @@ namespace XNodeEditor {
                 this.drawer = drawer;
                 rect = Rect.zero;
             }
+
+            public bool IsVisible()
+            {
+                return drawer != null && drawer.IsVisible();
+            }
         }
     }
 }
