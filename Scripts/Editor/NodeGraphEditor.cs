@@ -296,11 +296,22 @@ namespace XNodeEditor {
             if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
         }
 
-        protected void AddToolbarOption(bool left, Func<bool> drawer, Action action = null, Func<bool> active = null) {
-            if (left)
-                toolbarOptionsLeft.Add(new ToolbarOption(drawer, action, active));
+        protected void AddToolbarOption(bool left, Func<bool> drawer, Action action = null, Func<bool> active = null, bool insertAsFirst = false) {
+
+            if (insertAsFirst)
+            {
+                if (left)
+                    toolbarOptionsLeft.Insert(0, new ToolbarOption(drawer, action, active));
+                else
+                    toolbarOptionsRight.Insert(0, new ToolbarOption(drawer, action, active));
+            }
             else
-                toolbarOptionsRight.Add(new ToolbarOption(drawer, action, active));
+            {
+                if (left)
+                    toolbarOptionsLeft.Add(new ToolbarOption(drawer, action, active));
+                else
+                    toolbarOptionsRight.Add(new ToolbarOption(drawer, action, active));
+            }
         }
 
         protected void AddPanel(bool left, INodeEditorPanel panel) {
