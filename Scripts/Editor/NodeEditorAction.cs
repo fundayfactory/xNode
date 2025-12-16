@@ -383,6 +383,7 @@ namespace XNodeEditor {
 
         private bool TryFindConnection(Event e, out Vector2 closestPointOnConnection, out int rerouteIndex, out List<Vector2> reroutePoints)
         {
+
             List<Vector2> gridPoints = new List<Vector2>(2);
             foreach (Node node in graph.nodes)
             {
@@ -433,8 +434,6 @@ namespace XNodeEditor {
                     }
                 }
             }
-
-            Debug.Log($"No connection found");
 
             closestPointOnConnection = Vector2.zero;
             rerouteIndex = -1;

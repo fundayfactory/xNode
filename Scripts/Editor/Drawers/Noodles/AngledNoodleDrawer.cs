@@ -199,7 +199,7 @@ namespace XNodeEditor {
 
             for (var i = 0; i < pointDatas.Count - 1; i++)
             {
-                if (IsPointWithinDistanceOfLine(pointDatas[i].point, pointDatas[i + 1].point, mousePosition, 10 / zoom, out point))
+                if (IsPointWithinDistanceOfLineSegment(pointDatas[i].point, pointDatas[i + 1].point, mousePosition, 10 / zoom, out point))
                 {
                     gridPointIndex = pointDatas[i].gridPointIndex;
                     return true;
@@ -209,40 +209,34 @@ namespace XNodeEditor {
             return false;
         }
 
-        public static bool IsPointWithinDistanceOfLine(
+        public static bool IsPointWithinDistanceOfLineSegment(
             Vector2 linePointA,
             Vector2 linePointB,
             Vector2 targetPoint,
-            float thresholdDistance,
+            float distanceThreshold,
             out Vector2 closestPoint)
         {
-            // 1. Define the vectors needed for the calculation.
-            Vector2 lineDirection = linePointB - linePointA;
+            Vector2 lineSegment = linePointB - linePointA;
             Vector2 targetDirection = targetPoint - linePointA;
 
-            // 2. Calculate the projection parameter (t).
-            // t = (targetDirection . lineDirection) / ||lineDirection||^2
+            float lineSegmentLength = lineSegment.sqrMagnitude;
 
-            float lineLengthSq = lineDirection.sqrMagnitude; // Use sqrMagnitude to avoid sqrt
-
-            // Handle the case where A and B are the same point (line has zero length)
-            if (lineLengthSq == 0f)
+            if (lineSegmentLength == 0f)
             {
                 closestPoint = linePointA;
-                return Vector2.Distance(targetPoint, linePointA) <= thresholdDistance;
+                return Vector2.Distance(targetPoint, linePointA) <= distanceThreshold;
             }
 
-            float dotProduct = Vector2.Dot(targetDirection, lineDirection);
-            float t = dotProduct / lineLengthSq;
+            float dotProduct = Vector2.Dot(targetDirection, lineSegment);
+            float t = dotProduct / lineSegmentLength;
 
-            // 3. Calculate the closest point on the infinite line.
-            // Q = A + t * lineDirection
-            closestPoint = linePointA + t * lineDirection;
+            t = Mathf.Clamp01(t);
 
-            // 4. Check the distance between the closest point and the target point.
+            closestPoint = linePointA + t * lineSegment;
+
             float actualDistance = Vector2.Distance(targetPoint, closestPoint);
 
-            return actualDistance <= thresholdDistance;
+            return actualDistance <= distanceThreshold;
         }
 
         private void CalcConnection(PointDirectionalData p1, PointDirectionalData p2, List<PointData> pointDatas)
