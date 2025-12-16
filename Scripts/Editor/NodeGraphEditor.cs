@@ -94,6 +94,8 @@ namespace XNodeEditor {
             return output.CanConnectTo(input);
         }
 
+        public virtual bool TryConnectionSelected(XNode.NodePort output, XNode.NodePort input) { return false; }
+
         /// <summary>
         /// Add items for the context menu when right-clicking this node.
         /// Override to add custom menu items.

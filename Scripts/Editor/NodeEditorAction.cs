@@ -308,7 +308,7 @@ namespace XNodeEditor {
                                 menu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
                                 e.Use(); // Fixes copy/paste context menu appearing in Unity 5.6.6f2 - doesn't occur in 2018.3.2f1 Probably needs to be used in other places.
                             } else if (!IsHoveringNode) {
-                                if (TryFindConnection(e, out Vector2 closestPoint, out int rerouteIndex, out var reroutePoints))
+                                if (TryFindConnection(e, out _, out _, out Vector2 closestPoint, out int rerouteIndex, out var reroutePoints))
                                 {
                                     ShowConnectionContextMenu(closestPoint, rerouteIndex, reroutePoints);
                                 }
@@ -381,9 +381,8 @@ namespace XNodeEditor {
             }
         }
 
-        private bool TryFindConnection(Event e, out Vector2 closestPointOnConnection, out int rerouteIndex, out List<Vector2> reroutePoints)
+        private bool TryFindConnection(Event e, out NodePort outPort, out NodePort inPort, out Vector2 closestPointOnConnection, out int rerouteIndex, out List<Vector2> reroutePoints)
         {
-
             List<Vector2> gridPoints = new List<Vector2>(2);
             foreach (Node node in graph.nodes)
             {
@@ -427,6 +426,8 @@ namespace XNodeEditor {
                         if (noodleDrawer.TryFindPointWithinDistance(output, input, e.mousePosition, zoom, noodleGradient, gridPoints, out var point, out var index))
                         {
                             closestPointOnConnection = WindowToGridPosition(point);
+                            outPort = output;
+                            inPort = input;
                             rerouteIndex = index;
                             reroutePoints = points;
                             return true;
@@ -436,6 +437,8 @@ namespace XNodeEditor {
             }
 
             closestPointOnConnection = Vector2.zero;
+            outPort = null;
+            inPort = null;
             rerouteIndex = -1;
             reroutePoints = null;
             return false;
@@ -462,7 +465,8 @@ namespace XNodeEditor {
                         if (!isMouseDownEventUsed && !IsDraggingPort && currentActivity != NodeActivity.DragNode && !IsHoveringNode && !isPanning) {
                             EditorGUI.FocusTextInControl(null);
                             EditorGUIUtility.editingTextField = false;
-                            graphEditor.OnDeselect();
+                            if (!TryFindConnection(e, out var outPort, out var inPort, out _, out _, out _) || !graphEditor.TryConnectionSelected(outPort, inPort))
+                                graphEditor.OnDeselect();
                             e.Use();
                         }
                     }
