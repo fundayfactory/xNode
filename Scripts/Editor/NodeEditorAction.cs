@@ -308,10 +308,17 @@ namespace XNodeEditor {
                                 menu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
                                 e.Use(); // Fixes copy/paste context menu appearing in Unity 5.6.6f2 - doesn't occur in 2018.3.2f1 Probably needs to be used in other places.
                             } else if (!IsHoveringNode) {
-                                autoConnectOutput = null;
-                                GenericMenu menu = new GenericMenu();
-                                graphEditor.AddContextMenuItems(menu);
-                                menu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
+                                if (TryFindConnection(e, out Vector2 closestPoint, out int rerouteIndex, out var reroutePoints))
+                                {
+                                    ShowConnectionContextMenu(closestPoint, rerouteIndex, reroutePoints);
+                                }
+                                else
+                                {
+                                    autoConnectOutput = null;
+                                    GenericMenu menu = new GenericMenu();
+                                    graphEditor.AddContextMenuItems(menu);
+                                    menu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
+                                }
                             }
                         }
                         isPanning = false;
@@ -372,6 +379,67 @@ namespace XNodeEditor {
                     }
                     break;
             }
+        }
+
+        private bool TryFindConnection(Event e, out Vector2 closestPointOnConnection, out int rerouteIndex, out List<Vector2> reroutePoints)
+        {
+            List<Vector2> gridPoints = new List<Vector2>(2);
+            foreach (Node node in graph.nodes)
+            {
+                //If a null node is found, return. This can happen if the nodes associated script is deleted. It is currently not possible in Unity to delete a null asset.
+                if (node == null) continue;
+
+                // Draw full connections and output > reroute
+                foreach (NodePort output in node.Outputs)
+                {
+                    if (!_portConnectionPoints.TryGetValue(output, out var fromRect))
+                        continue;
+
+                    for (int connectionIndex = 0; connectionIndex < output.ConnectionCount; connectionIndex++)
+                    {
+                        NodePort input = output.GetConnection(connectionIndex);
+                        Gradient noodleGradient = graphEditor.GetNoodleGradient(output, input);
+                        INoodleDrawer noodleDrawer = graphEditor.GetNoodleDrawer(output, input);
+
+                        // Error handling
+                        if (input == null)
+                            continue; //If a script has been updated and the port doesn't exist, it is removed and null is returned. If this happens, return.
+
+                        if (!input.IsConnectedTo(output))
+                            input.Connect(output);
+
+                        if (!_portConnectionPoints.TryGetValue(input, out var toRect))
+                            continue;
+
+                        List<Vector2> points = output.GetReroutePoints(connectionIndex);
+
+                        gridPoints.Clear();
+                        gridPoints.Add(fromRect.center);
+                        gridPoints.AddRange(points);
+                        gridPoints.Add(toRect.center);
+
+                        for (var i = 0; i < gridPoints.Count; ++i)
+                        {
+                            gridPoints[i] = GridToWindowPosition(gridPoints[i]);
+                        }
+
+                        if (noodleDrawer.TryFindPointWithinDistance(output, input, e.mousePosition, zoom, noodleGradient, gridPoints, out var point, out var index))
+                        {
+                            closestPointOnConnection = WindowToGridPosition(point);
+                            rerouteIndex = index;
+                            reroutePoints = points;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            Debug.Log($"No connection found");
+
+            closestPointOnConnection = Vector2.zero;
+            rerouteIndex = -1;
+            reroutePoints = null;
+            return false;
         }
 
         private void PostControls()

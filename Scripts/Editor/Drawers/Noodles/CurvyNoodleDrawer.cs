@@ -71,6 +71,13 @@ namespace XNodeEditor.Noodles {
             }
         }
 
+        public bool TryFindPointWithinDistance(NodePort outputPort, NodePort inputPort, Vector2 mousePosition, float zoom, Gradient gradient, List<Vector2> gridPoints, out Vector2 point, out int gridPointIndex)
+        {
+            point = Vector2.zero;
+            gridPointIndex = -1;
+            return false;
+        }
+
         private Vector2 GetTangentForPort(NodePort port) {
             if (port == null)
                 return Vector2.left;

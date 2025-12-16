@@ -114,10 +114,26 @@ namespace XNodeEditor {
         /// <summary> Show right-click context menu for hovered reroute </summary>
         void ShowRerouteContextMenu(RerouteReference reroute) {
             GenericMenu contextMenu = new GenericMenu();
-            contextMenu.AddItem(new GUIContent("Remove"), false, () => reroute.RemovePoint());
+            contextMenu.AddItem(new GUIContent("Remove"), false, () =>
+            {
+                reroute.RemovePoint();
+                if (NodeEditorPreferences.GetSettings().autoSave)
+                    AssetDatabase.SaveAssets();
+            });
+
+            contextMenu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
+        }
+
+        void ShowConnectionContextMenu(Vector2 point, int rerouteIndex, List<Vector2> reroutePoints) {
+            GenericMenu contextMenu = new GenericMenu();
+            contextMenu.AddItem(new GUIContent("Add"), false, () =>
+            {
+                reroutePoints.Insert(rerouteIndex, point);
+            });
             contextMenu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
             if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
         }
+
 
         /// <summary> Show right-click context menu for hovered port </summary>
         void ShowPortContextMenu(XNode.NodePort hoveredPort) {
