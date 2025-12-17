@@ -254,11 +254,11 @@ namespace XNodeEditor {
                             draggedOutput = null;
                             draggedOutputTarget = null;
                             EditorUtility.SetDirty(graph);
-                            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+                            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssetIfDirty(graph);
                         } else if (currentActivity == NodeActivity.DragNode) {
                             IEnumerable<XNode.Node> nodes = Selection.objects.Where(x => x is XNode.Node).Select(x => x as XNode.Node);
                             foreach (XNode.Node node in nodes) EditorUtility.SetDirty(node);
-                            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+                            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssetIfDirty(graph);
                         } else if (!IsHoveringNode) {
                             // If click outside node, release field focus
                             if (!isPanning) {
@@ -266,7 +266,7 @@ namespace XNodeEditor {
                                 // EditorGUI.FocusTextInControl(null);
                                 // EditorGUIUtility.editingTextField = false;
                             }
-                            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+                            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssetIfDirty(graph);
                         }
 
                         // If click node header, select it.
@@ -713,7 +713,7 @@ namespace XNodeEditor {
 
             // Save changes
             EditorUtility.SetDirty(graph);
-            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssetIfDirty(graph);
             autoConnectOutput = null;
         }
     }

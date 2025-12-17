@@ -83,7 +83,7 @@ namespace XNodeEditor {
             ValidateGraphEditor();
             if (graphEditor != null) {
                 graphEditor.OnWindowFocus();
-                if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+                if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssetIfDirty(graph);
             }
 
             dragThreshold = Math.Max(1f, Screen.width / 1000f);
@@ -130,7 +130,7 @@ namespace XNodeEditor {
         public void Save() {
             if (AssetDatabase.Contains(graph)) {
                 EditorUtility.SetDirty(graph);
-                if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+                AssetDatabase.SaveAssetIfDirty(graph);
             } else SaveAs();
         }
 
@@ -142,7 +142,7 @@ namespace XNodeEditor {
                 if (existingGraph != null) AssetDatabase.DeleteAsset(path);
                 AssetDatabase.CreateAsset(graph, path);
                 EditorUtility.SetDirty(graph);
-                if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+                AssetDatabase.SaveAssetIfDirty(graph);
             }
         }
 

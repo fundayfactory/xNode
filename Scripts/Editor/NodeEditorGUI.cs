@@ -118,7 +118,7 @@ namespace XNodeEditor {
             {
                 reroute.RemovePoint();
                 if (NodeEditorPreferences.GetSettings().autoSave)
-                    AssetDatabase.SaveAssets();
+                    AssetDatabase.SaveAssetIfDirty(graph);
             });
 
             contextMenu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
@@ -129,9 +129,11 @@ namespace XNodeEditor {
             contextMenu.AddItem(new GUIContent("Add"), false, () =>
             {
                 reroutePoints.Insert(rerouteIndex, point);
+                if (NodeEditorPreferences.GetSettings().autoSave)
+                    AssetDatabase.SaveAssetIfDirty(graph);
             });
+
             contextMenu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
-            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
         }
 
 
@@ -154,7 +156,7 @@ namespace XNodeEditor {
                     graphEditor.AddContextMenuItems(contextMenu, hoveredPort.ValueType, XNode.NodePort.IO.Input);
             }
             contextMenu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
-            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
+            if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssetIfDirty(graph);
         }
 
         /// <summary> Draw a bezier from output to input in grid coordinates </summary>
