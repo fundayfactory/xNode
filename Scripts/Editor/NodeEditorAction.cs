@@ -187,7 +187,7 @@ namespace XNodeEditor {
                                     if (NodeEditor.onUpdateNode != null) NodeEditor.onUpdateNode(node);
                                 }
                             }
-                        } else if (IsHoveringNode && IsHoveringTitle(hoveredNode)) {
+                        } else if (IsHoveringNode) {
                             // If mousedown on node header, select or deselect
                             if (!Selection.Contains(hoveredNode)) {
                                 SelectNode(hoveredNode, e.control || e.shift);
@@ -197,7 +197,6 @@ namespace XNodeEditor {
                             // Cache double click state, but only act on it in MouseUp - Except ClickCount only works in mouseDown.
                             isDoubleClick = (e.clickCount == 2);
 
-                            e.Use();
                             currentActivity = NodeActivity.HoldNode;
                         } else if (IsHoveringReroute) {
                             // If reroute isn't selected
@@ -300,13 +299,13 @@ namespace XNodeEditor {
                                 ShowRerouteContextMenu(hoveredReroute);
                             } else if (IsHoveringPort) {
                                 ShowPortContextMenu(hoveredPort);
-                            } else if (IsHoveringNode && IsHoveringTitle(hoveredNode)) {
+                            } else if (IsHoveringNode) {
                                 if (!Selection.Contains(hoveredNode)) SelectNode(hoveredNode, false);
                                 autoConnectOutput = null;
                                 GenericMenu menu = new GenericMenu();
                                 NodeEditor.GetEditor(hoveredNode, this).AddContextMenuItems(menu);
                                 menu.DropDown(new Rect(Event.current.mousePosition, Vector2.zero));
-                                e.Use(); // Fixes copy/paste context menu appearing in Unity 5.6.6f2 - doesn't occur in 2018.3.2f1 Probably needs to be used in other places.
+
                             } else if (!IsHoveringNode) {
                                 if (TryFindConnection(e, out _, out _, out Vector2 closestPoint, out int rerouteIndex, out var reroutePoints))
                                 {

@@ -514,7 +514,8 @@ namespace XNodeEditor {
             if (graphEditor == null)
                 return;
 
-            float padding = topPadding + GetToolbarRect().height;
+            float toolbarHeight = GetToolbarRect().height;
+            float padding = topPadding + toolbarHeight;
 
             GUI.EndClip();
             GUI.BeginClip(new Rect(0f, padding, position.width, position.height));
@@ -534,7 +535,10 @@ namespace XNodeEditor {
                 GUILayout.EndVertical();
 
                 if (Event.current.type == EventType.Repaint)
+                {
                     panel.rect = GUILayoutUtility.GetLastRect();
+                    panel.rect.y += toolbarHeight;
+                }
             }
 
             GUILayout.EndVertical();
@@ -553,7 +557,10 @@ namespace XNodeEditor {
                 GUILayout.EndVertical();
 
                 if (Event.current.type == EventType.Repaint)
+                {
                     panel.rect = GUILayoutUtility.GetLastRect();
+                    panel.rect.y += toolbarHeight;
+                }
             }
 
             GUILayout.EndVertical();
