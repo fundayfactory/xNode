@@ -197,7 +197,11 @@ namespace XNodeEditor {
                             // Cache double click state, but only act on it in MouseUp - Except ClickCount only works in mouseDown.
                             isDoubleClick = (e.clickCount == 2);
 
-                            currentActivity = NodeActivity.HoldNode;
+                            if (IsHoveringTitle(hoveredNode))
+                            {
+                                currentActivity = NodeActivity.HoldNode;
+                                e.Use();
+                            }
                         } else if (IsHoveringReroute) {
                             // If reroute isn't selected
                             if (!selectedReroutes.Contains(hoveredReroute)) {
