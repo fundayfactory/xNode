@@ -55,7 +55,9 @@ namespace XNodeEditor.Internal {
 			if (editor.target == null) editor.target = target;
 			if (editor.window != window) editor.window = window;
 
-            editor.serializedObject = new SerializedObject(target);
+            if (editor.serializedObject == null || editor.serializedObject.targetObject != target)
+                editor.serializedObject = new SerializedObject(target);
+
 			return editor;
 		}
 
