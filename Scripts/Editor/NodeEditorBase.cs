@@ -57,6 +57,8 @@ namespace XNodeEditor.Internal {
 
             if (editor.serializedObject == null || editor.serializedObject.targetObject != target)
                 editor.serializedObject = new SerializedObject(target);
+            else
+                editor.serializedObject.Update();
 
 			return editor;
 		}
