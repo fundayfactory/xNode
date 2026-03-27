@@ -36,15 +36,16 @@ namespace XNodeEditor {
     }
 
     [Serializable]
-    public sealed class AngledNoodleDrawer : INoodleDrawer {
+    public sealed class AngledNoodleDrawer : INoodleDrawer
+    {
         public string Name => "Angled";
 
         private class PointData
         {
-            public Vector2 point;
-            public int gridPointIndex;
-            public float normalizedDistance;
-            public float distance;
+            public Vector2 Point;
+            public int GridPointIndex;
+            public float NormalizedDistance;
+            public float Distance;
         }
 
         private static Vector2 DirectionToVector(NoodleDirection direction)
@@ -54,11 +55,11 @@ namespace XNodeEditor {
 
         private class PointDirectionalData
         {
-            public Vector2 point;
-            public int gridPointIndex;
-            public NoodleDirection outDirection;
-            public NoodleDirection inDirection;
-            public NoodleDirection validOutDirections => NoodleDirection.All ^ outDirection ^ inDirection;
+            public Vector2 Point;
+            public int GridPointIndex;
+            public NoodleDirection OutDirection;
+            public NoodleDirection InDirection;
+            public NoodleDirection ValidOutDirections => NoodleDirection.All ^ OutDirection ^ InDirection;
         }
 
 
@@ -76,12 +77,12 @@ namespace XNodeEditor {
                 PointData pd1 = pointDatas[i];
                 PointData pd2 = pointDatas[i+1];
 
-                if (pd1.distance <= halfLength && pd2.distance >= halfLength)
-                     center = pd1.point + (pd2.point - pd1.point) * ((halfLength - pd1.distance) / (pd2.distance - pd1.distance));
+                if (pd1.Distance <= halfLength && pd2.Distance >= halfLength)
+                     center = pd1.Point + (pd2.Point - pd1.Point) * ((halfLength - pd1.Distance) / (pd2.Distance - pd1.Distance));
 
-                pd1.normalizedDistance = pd2.distance / totalLength;
-                Handles.color = gradient.Evaluate(pd1.normalizedDistance);
-                NoodleDrawerUtility.DrawAAPolyLineNonAlloc(thickness, pd1.point, pd2.point);
+                pd1.NormalizedDistance = pd2.Distance / totalLength;
+                Handles.color = gradient.Evaluate(pd1.NormalizedDistance);
+                NoodleDrawerUtility.DrawAAPolyLineNonAlloc(thickness, pd1.Point, pd2.Point);
             }
 
             if(outputPort != null && inputPort != null)
@@ -112,36 +113,36 @@ namespace XNodeEditor {
                     Vector2 nodePos = NodeEditorWindow.current.GridToWindowPosition(outputPort.node.position);
                     float nodeTop = nodePos.y - (nodePadding - 16) / zoom;
 
-                    pointDatas.Add(new PointData{point = start, gridPointIndex = 0});
-                    pointDatas.Add(new PointData{point = new Vector2(start.x + nodePaddingZoomed, start.y), gridPointIndex = 0});
-                    pointDatas.Add(new PointData{point = new Vector2(start.x + nodePaddingZoomed, nodeTop), gridPointIndex = 0});
-                    pointDatas.Add(new PointData{point = new Vector2(end.x - nodePaddingZoomed, nodeTop), gridPointIndex = 0});
-                    pointDatas.Add(new PointData{point = new Vector2(end.x - nodePaddingZoomed, end.y), gridPointIndex = 0});
-                    pointDatas.Add(new PointData{point = end, gridPointIndex = 1});
+                    pointDatas.Add(new PointData{Point = start, GridPointIndex = 0});
+                    pointDatas.Add(new PointData{Point = new Vector2(start.x + nodePaddingZoomed, start.y), GridPointIndex = 0});
+                    pointDatas.Add(new PointData{Point = new Vector2(start.x + nodePaddingZoomed, nodeTop), GridPointIndex = 0});
+                    pointDatas.Add(new PointData{Point = new Vector2(end.x - nodePaddingZoomed, nodeTop), GridPointIndex = 0});
+                    pointDatas.Add(new PointData{Point = new Vector2(end.x - nodePaddingZoomed, end.y), GridPointIndex = 0});
+                    pointDatas.Add(new PointData{Point = end, GridPointIndex = 1});
                 }
                 else if (start.x <= end.x - nodePaddingZoomed * 2f)
                 {
                     float midpoint = (start.x + end.x) * 0.5f;
-                    pointDatas.Add(new PointData { point = start, gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = new Vector2(midpoint, start.y), gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = new Vector2(midpoint, end.y), gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = end, gridPointIndex = 1});
+                    pointDatas.Add(new PointData { Point = start, GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = new Vector2(midpoint, start.y), GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = new Vector2(midpoint, end.y), GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = end, GridPointIndex = 1});
                 }
                 else
                 {
                     float midpoint = (start.y + end.y) * 0.5f;
-                    pointDatas.Add(new PointData { point = start, gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = new Vector2(start.x + nodePaddingZoomed, start.y), gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = new Vector2(start.x + nodePaddingZoomed, midpoint), gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = new Vector2(end.x - nodePaddingZoomed, midpoint), gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = new Vector2(end.x - nodePaddingZoomed, end.y), gridPointIndex = 0});
-                    pointDatas.Add(new PointData { point = end, gridPointIndex = 1});
+                    pointDatas.Add(new PointData { Point = start, GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = new Vector2(start.x + nodePaddingZoomed, start.y), GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = new Vector2(start.x + nodePaddingZoomed, midpoint), GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = new Vector2(end.x - nodePaddingZoomed, midpoint), GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = new Vector2(end.x - nodePaddingZoomed, end.y), GridPointIndex = 0});
+                    pointDatas.Add(new PointData { Point = end, GridPointIndex = 1});
                 }
 
                 for (var i = 1; i < pointDatas.Count; i++)
                 {
-                    totalLength += (pointDatas[i].point - pointDatas[i - 1].point).magnitude;
-                    pointDatas[i].distance = totalLength;
+                    totalLength += (pointDatas[i].Point - pointDatas[i - 1].Point).magnitude;
+                    pointDatas[i].Distance = totalLength;
                 }
             }
             else
@@ -150,21 +151,21 @@ namespace XNodeEditor {
 
                 pointDirectionalDatas.Add(new PointDirectionalData
                 {
-                    point = gridPoints[0] + Vector2.right * nodePaddingZoomed,
-                    inDirection = NoodleDirection.Left,
-                    gridPointIndex = 0
+                    Point = gridPoints[0] + Vector2.right * nodePaddingZoomed,
+                    InDirection = NoodleDirection.Left,
+                    GridPointIndex = 0
                 });
 
                 for (var i = 1; i < gridPoints.Count-1; i++)
                 {
-                    pointDirectionalDatas.Add(new PointDirectionalData{point = gridPoints[i], gridPointIndex = i});
+                    pointDirectionalDatas.Add(new PointDirectionalData{Point = gridPoints[i], GridPointIndex = i});
                 }
                 if(inputPort == null)
-                    pointDirectionalDatas.Add(new PointDirectionalData{point = gridPoints[^1], gridPointIndex = gridPoints.Count-1});
+                    pointDirectionalDatas.Add(new PointDirectionalData{Point = gridPoints[^1], GridPointIndex = gridPoints.Count-1});
                 else
-                    pointDirectionalDatas.Add(new PointDirectionalData{point = gridPoints[^1] + Vector2.left * nodePaddingZoomed, gridPointIndex = gridPoints.Count-1, outDirection = NoodleDirection.Right});
+                    pointDirectionalDatas.Add(new PointDirectionalData{Point = gridPoints[^1] + Vector2.left * nodePaddingZoomed, GridPointIndex = gridPoints.Count-1, OutDirection = NoodleDirection.Right});
 
-                pointDatas.Add(new PointData{point = gridPoints[0], gridPointIndex = 0});
+                pointDatas.Add(new PointData{Point = gridPoints[0], GridPointIndex = 0});
 
                 for (var i = 0; i < pointDirectionalDatas.Count-1; i++)
                 {
@@ -174,12 +175,12 @@ namespace XNodeEditor {
                     CalcConnection(p1, p2, pointDatas);
                 }
 
-                pointDatas.Add(new PointData{point = gridPoints[^1], gridPointIndex = gridPoints.Count-1});
+                pointDatas.Add(new PointData{Point = gridPoints[^1], GridPointIndex = gridPoints.Count-1});
 
                 for (var i = 1; i < pointDatas.Count; i++)
                 {
-                    totalLength += (pointDatas[i].point - pointDatas[i - 1].point).magnitude;
-                    pointDatas[i].distance = totalLength;
+                    totalLength += (pointDatas[i].Point - pointDatas[i - 1].Point).magnitude;
+                    pointDatas[i].Distance = totalLength;
                 }
             }
 
@@ -194,14 +195,14 @@ namespace XNodeEditor {
             point = Vector2.zero;
             gridPointIndex = -1;
 
-            if (TryGeneratePointData(outputPort, inputPort, zoom, gridPoints, out var pointDatas, out var totalLength))
+            if (TryGeneratePointData(outputPort, inputPort, zoom, gridPoints, out var pointDatas, out _))
                 return false;
 
             for (var i = 0; i < pointDatas.Count - 1; i++)
             {
-                if (IsPointWithinDistanceOfLineSegment(pointDatas[i].point, pointDatas[i + 1].point, mousePosition, 10 / zoom, out point))
+                if (IsPointWithinDistanceOfLineSegment(pointDatas[i].Point, pointDatas[i + 1].Point, mousePosition, 10 / zoom, out point))
                 {
-                    gridPointIndex = pointDatas[i].gridPointIndex;
+                    gridPointIndex = pointDatas[i].GridPointIndex;
                     return true;
                 }
             }
@@ -243,23 +244,23 @@ namespace XNodeEditor {
         {
             if(IsOpposite(p1, p2, out NoodleDirection outOpposite, out NoodleDirection inOpposite))
             {
-                pointDatas.Add(new PointData{point = p1.point, gridPointIndex = p1.gridPointIndex});
-                pointDatas.Add(new PointData{point = p2.point, gridPointIndex = p2.gridPointIndex});
+                pointDatas.Add(new PointData{Point = p1.Point, GridPointIndex = p1.GridPointIndex});
+                pointDatas.Add(new PointData{Point = p2.Point, GridPointIndex = p2.GridPointIndex});
 
-                p1.outDirection = outOpposite;
-                p2.inDirection = inOpposite;
+                p1.OutDirection = outOpposite;
+                p2.InDirection = inOpposite;
 
                 return;
             }
 
             if (IsCrossing(p1, p2, out Vector2 crossingPoint, out NoodleDirection outCrossing, out NoodleDirection inCrossing))
             {
-                pointDatas.Add(new PointData{point = p1.point, gridPointIndex = p1.gridPointIndex});
-                pointDatas.Add(new PointData{point = crossingPoint, gridPointIndex = p1.gridPointIndex});
-                pointDatas.Add(new PointData{point = p2.point, gridPointIndex = p2.gridPointIndex});
+                pointDatas.Add(new PointData{Point = p1.Point, GridPointIndex = p1.GridPointIndex});
+                pointDatas.Add(new PointData{Point = crossingPoint, GridPointIndex = p1.GridPointIndex});
+                pointDatas.Add(new PointData{Point = p2.Point, GridPointIndex = p2.GridPointIndex});
 
-                p1.outDirection = outCrossing;
-                p2.inDirection = inCrossing;
+                p1.OutDirection = outCrossing;
+                p2.InDirection = inCrossing;
 
                 return;
             }
@@ -270,28 +271,28 @@ namespace XNodeEditor {
 
         private bool IsOpposite(PointDirectionalData current, PointDirectionalData other, out NoodleDirection outDir, out NoodleDirection inDir)
         {
-            if ((current.validOutDirections & NoodleDirection.Left) != 0 && (other.validOutDirections & NoodleDirection.Right) != 0 && current.point.x >= other.point.x && Mathf.Approximately(current.point.y, other.point.y))
+            if ((current.ValidOutDirections & NoodleDirection.Left) != 0 && (other.ValidOutDirections & NoodleDirection.Right) != 0 && current.Point.x >= other.Point.x && Mathf.Approximately(current.Point.y, other.Point.y))
             {
                 outDir = NoodleDirection.Left;
                 inDir = NoodleDirection.Right;
                 return true;
             }
 
-            if ((current.validOutDirections & NoodleDirection.Right) != 0 && (other.validOutDirections & NoodleDirection.Left) != 0 && current.point.x <= other.point.x && Mathf.Approximately(current.point.y, other.point.y))
+            if ((current.ValidOutDirections & NoodleDirection.Right) != 0 && (other.ValidOutDirections & NoodleDirection.Left) != 0 && current.Point.x <= other.Point.x && Mathf.Approximately(current.Point.y, other.Point.y))
             {
                 outDir = NoodleDirection.Right;
                 inDir = NoodleDirection.Left;
                 return true;
             }
 
-            if ((current.validOutDirections & NoodleDirection.Up) != 0 && (other.validOutDirections & NoodleDirection.Down) != 0 && current.point.y >= other.point.y && Mathf.Approximately(current.point.x, other.point.x))
+            if ((current.ValidOutDirections & NoodleDirection.Up) != 0 && (other.ValidOutDirections & NoodleDirection.Down) != 0 && current.Point.y >= other.Point.y && Mathf.Approximately(current.Point.x, other.Point.x))
             {
                 outDir = NoodleDirection.Up;
                 inDir = NoodleDirection.Down;
                 return true;
             }
 
-            if ((current.validOutDirections & NoodleDirection.Down) != 0 && (other.validOutDirections & NoodleDirection.Up) != 0 && current.point.y <= other.point.y && Mathf.Approximately(current.point.x, other.point.x))
+            if ((current.ValidOutDirections & NoodleDirection.Down) != 0 && (other.ValidOutDirections & NoodleDirection.Up) != 0 && current.Point.y <= other.Point.y && Mathf.Approximately(current.Point.x, other.Point.x))
             {
                 outDir = NoodleDirection.Down;
                 inDir = NoodleDirection.Up;
@@ -306,13 +307,13 @@ namespace XNodeEditor {
 
         private bool IsCrossing(PointDirectionalData current, PointDirectionalData other, out Vector2 crossingPoint, out NoodleDirection outDir, out NoodleDirection inDir)
         {
-            NoodleDirection opposite = current.inDirection.Opposite();
+            NoodleDirection opposite = current.InDirection.Opposite();
 
-            if (IsIntersecting(opposite, other.validOutDirections, current.point, other.point, out crossingPoint, out outDir, out inDir))
+            if (IsIntersecting(opposite, other.ValidOutDirections, current.Point, other.Point, out crossingPoint, out outDir, out inDir))
                 return true;
 
-            NoodleDirection valid = current.validOutDirections & ~opposite;
-            if (IsIntersecting(valid, other.validOutDirections, current.point, other.point, out crossingPoint, out outDir, out inDir))
+            NoodleDirection valid = current.ValidOutDirections & ~opposite;
+            if (IsIntersecting(valid, other.ValidOutDirections, current.Point, other.Point, out crossingPoint, out outDir, out inDir))
                 return true;
 
             crossingPoint = Vector2.zero;
@@ -408,48 +409,48 @@ namespace XNodeEditor {
 
         private bool FindBestDirections(PointDirectionalData current, PointDirectionalData other)
         {
-            if ((current.validOutDirections & NoodleDirection.Left) != 0 && current.point.x >= other.point.x)
+            if ((current.ValidOutDirections & NoodleDirection.Left) != 0 && current.Point.x >= other.Point.x)
             {
-                if ((other.validOutDirections & NoodleDirection.Right) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Right) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Up) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Up) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Down) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Down) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Left) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Left) != 0)
                     return true;
             }
-            if ((current.validOutDirections & NoodleDirection.Right) != 0 && current.point.x <= other.point.x)
+            if ((current.ValidOutDirections & NoodleDirection.Right) != 0 && current.Point.x <= other.Point.x)
             {
-                if ((other.validOutDirections & NoodleDirection.Left) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Left) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Up) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Up) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Down) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Down) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Right) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Right) != 0)
                     return true;
             }
-            if ((current.validOutDirections & NoodleDirection.Up) != 0 && current.point.y <= other.point.y)
+            if ((current.ValidOutDirections & NoodleDirection.Up) != 0 && current.Point.y <= other.Point.y)
             {
-                if ((other.validOutDirections & NoodleDirection.Down) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Down) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Left) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Left) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Right) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Right) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Up) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Up) != 0)
                     return true;
             }
-            if ((current.validOutDirections & NoodleDirection.Down) != 0 && current.point.y >= other.point.y)
+            if ((current.ValidOutDirections & NoodleDirection.Down) != 0 && current.Point.y >= other.Point.y)
             {
-                if ((other.validOutDirections & NoodleDirection.Up) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Up) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Left) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Left) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Right) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Right) != 0)
                     return true;
-                if ((other.validOutDirections & NoodleDirection.Down) != 0)
+                if ((other.ValidOutDirections & NoodleDirection.Down) != 0)
                     return true;
             }
 
@@ -458,10 +459,10 @@ namespace XNodeEditor {
 
         private void GenerateConnection(PointDirectionalData current, PointDirectionalData other, List<PointData> pointDatas)
         {
-            var p1 = current.point;
-            var p2 = other.point;
-            var xDiff = other.point.x - current.point.x;
-            var yDiff = other.point.y - current.point.y;
+            var p1 = current.Point;
+            var p2 = other.Point;
+            var xDiff = other.Point.x - current.Point.x;
+            var yDiff = other.Point.y - current.Point.y;
             if(xDiff > yDiff)
             {
                 var midPoint = (p1.x + p2.x) * 0.5f;
@@ -475,9 +476,9 @@ namespace XNodeEditor {
                 p2.y = midPoint;
             }
 
-            pointDatas.Add(new PointData{point = p1, gridPointIndex = current.gridPointIndex});
-            pointDatas.Add(new PointData{point = p2, gridPointIndex = current.gridPointIndex});
-            pointDatas.Add(new PointData{point = other.point, gridPointIndex = other.gridPointIndex});
+            pointDatas.Add(new PointData{Point = p1, GridPointIndex = current.GridPointIndex});
+            pointDatas.Add(new PointData{Point = p2, GridPointIndex = current.GridPointIndex});
+            pointDatas.Add(new PointData{Point = other.Point, GridPointIndex = other.GridPointIndex});
         }
     }
 }

@@ -4,65 +4,80 @@ using UnityEditor;
 using UnityEngine;
 using XNode;
 
-namespace XNodeEditor.Noodles {
+namespace XNodeEditor.Noodles
+{
     [Serializable]
-    public sealed class CurvyNoodleDrawer : INoodleDrawer {
+    public sealed class CurvyNoodleDrawer : INoodleDrawer
+    {
         public string Name => "Curvy";
 
         public void DrawNoodle(NodeGraph graph, NodePort outputPort, NodePort inputPort, float zoom, Gradient gradient,
-            NoodleStroke stroke, float thickness, List<Vector2> gridPoints) {
+            NoodleStroke stroke, float thickness, List<Vector2> gridPoints)
+        {
             Vector2 outputTangent = GetTangentForPort(outputPort);
             int length = gridPoints.Count;
 
-            for (var i = 0; i < length - 1; i++) {
+            for (var i = 0; i < length - 1; i++)
+            {
                 Vector2 inputTangent;
+
                 // Cached most variables that repeat themselves here to avoid so many indexer calls :p
-                Vector2 point_a = gridPoints[i];
-                Vector2 point_b = gridPoints[i + 1];
-                float dist_ab = Vector2.Distance(point_a, point_b);
+                Vector2 pointA = gridPoints[i];
+                Vector2 pointB = gridPoints[i + 1];
+                float distAb = Vector2.Distance(pointA, pointB);
 
-                if (i == 0) outputTangent = zoom * dist_ab * 0.01f * GetTangentForPort(outputPort);
+                if (i == 0) outputTangent = zoom * distAb * 0.01f * GetTangentForPort(outputPort);
 
-                if (i < length - 2) {
-                    Vector2 point_c = gridPoints[i + 2];
-                    Vector2 ab = (point_b - point_a).normalized;
-                    Vector2 cb = (point_b - point_c).normalized;
-                    Vector2 ac = (point_c - point_a).normalized;
+                if (i < length - 2)
+                {
+                    Vector2 pointC = gridPoints[i + 2];
+                    Vector2 ab = (pointB - pointA).normalized;
+                    Vector2 cb = (pointB - pointC).normalized;
+                    Vector2 ac = (pointC - pointA).normalized;
                     Vector2 p = (ab + cb) * 0.5f;
-                    float tangentLength = (dist_ab + Vector2.Distance(point_b, point_c)) * 0.005f * zoom;
-                    float side = ((ac.x * (point_b.y - point_a.y)) - (ac.y * (point_b.x - point_a.x)));
+                    float tangentLength = (distAb + Vector2.Distance(pointB, pointC)) * 0.005f * zoom;
+                    float side = ((ac.x * (pointB.y - pointA.y)) - (ac.y * (pointB.x - pointA.x)));
 
                     p = tangentLength * Mathf.Sign(side) * new Vector2(-p.y, p.x);
                     inputTangent = p;
                 }
-                else {
-                    inputTangent = zoom * dist_ab * 0.01f * GetTangentForPort(inputPort);
+                else
+                {
+                    inputTangent = zoom * distAb * 0.01f * GetTangentForPort(inputPort);
                 }
 
                 // Calculates the tangents for the bezier's curves.
                 float zoomCoef = 50 / zoom;
-                Vector2 tangent_a = point_a + outputTangent * zoomCoef;
-                Vector2 tangent_b = point_b + inputTangent * zoomCoef;
+                Vector2 tangentA = pointA + outputTangent * zoomCoef;
+                Vector2 tangentB = pointB + inputTangent * zoomCoef;
 
                 // Hover effect.
-                int division = Mathf.RoundToInt(.2f * dist_ab) + 3;
+                int division = Mathf.RoundToInt(.2f * distAb) + 3;
 
                 // Coloring and bezier drawing.
                 var draw = 0;
-                Vector2 bezierPrevious = point_a;
+                Vector2 bezierPrevious = pointA;
 
-                for (var j = 1; j <= division; ++j) {
-                    if (stroke == NoodleStroke.Dashed) {
+                for (var j = 1; j <= division; ++j)
+                {
+                    if (stroke == NoodleStroke.Dashed)
+                    {
                         draw++;
 
                         if (draw >= 2) draw = -2;
+
                         if (draw < 0) continue;
-                        if (draw == 0) bezierPrevious = NoodleDrawerUtility.CalculateBezierPoint(point_a, tangent_a, tangent_b, point_b, (j - 1f) / (float)division);
+
+                        if (draw == 0)
+                            bezierPrevious = NoodleDrawerUtility.CalculateBezierPoint(pointA, tangentA, tangentB,
+                                pointB, (j - 1f) / (float)division);
                     }
 
                     if (i == length - 2) Handles.color = gradient.Evaluate((j + 1f) / division);
 
-                    Vector2 bezierNext = NoodleDrawerUtility.CalculateBezierPoint(point_a, tangent_a, tangent_b, point_b, j / (float)division);
+                    Vector2 bezierNext = NoodleDrawerUtility.CalculateBezierPoint(pointA, tangentA, tangentB,
+                        pointB, j / (float)division);
+
                     NoodleDrawerUtility.DrawAAPolyLineNonAlloc(thickness, bezierPrevious, bezierNext);
                     bezierPrevious = bezierNext;
                 }
@@ -71,21 +86,26 @@ namespace XNodeEditor.Noodles {
             }
         }
 
-        public bool TryFindPointWithinDistance(NodePort outputPort, NodePort inputPort, Vector2 mousePosition, float zoom, Gradient gradient, List<Vector2> gridPoints, out Vector2 point, out int gridPointIndex)
+        public bool TryFindPointWithinDistance(NodePort outputPort, NodePort inputPort, Vector2 mousePosition,
+            float zoom, Gradient gradient, List<Vector2> gridPoints, out Vector2 point, out int gridPointIndex)
         {
             point = Vector2.zero;
             gridPointIndex = -1;
+
             return false;
         }
 
-        private Vector2 GetTangentForPort(NodePort port) {
+        private Vector2 GetTangentForPort(NodePort port)
+        {
             if (port == null)
                 return Vector2.left;
 
-            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName, out Node.InputAttribute attIn) && attIn.isVerticalAligned)
+            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName,
+                    out Node.InputAttribute attIn) && attIn.isVerticalAligned)
                 return Vector2.down;
 
-            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName, out Node.OutputAttribute attOut) && attOut.isVerticalAligned)
+            if (NodeEditorUtilities.GetCachedAttrib(port.node.GetType(), port.fieldName,
+                    out Node.OutputAttribute attOut) && attOut.isVerticalAligned)
                 return Vector2.up;
 
             return port.direction == NodePort.IO.Input ? Vector2.left : Vector2.right;
