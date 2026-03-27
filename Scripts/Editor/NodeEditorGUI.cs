@@ -190,7 +190,7 @@ namespace XNodeEditor {
                 foreach (XNode.NodePort output in node.Outputs) {
                     //Needs cleanup. Null checks are ugly
                     Rect fromRect;
-                    if (!_portConnectionPoints.TryGetValue(output, out fromRect)) continue;
+                    if (!portConnectionPoints.TryGetValue(output, out fromRect)) continue;
 
                     Color portColor = graphEditor.GetPortColor(output);
                     GUIStyle portStyle = graphEditor.GetPortStyle(output);
@@ -207,7 +207,8 @@ namespace XNodeEditor {
                         if (input == null) continue; //If a script has been updated and the port doesn't exist, it is removed and null is returned. If this happens, return.
                         if (!input.IsConnectedTo(output)) input.Connect(output);
                         Rect toRect;
-                        if (!_portConnectionPoints.TryGetValue(input, out toRect)) continue;
+                        if (!portConnectionPoints.TryGetValue(input, out toRect))
+                            continue;
 
                         List<Vector2> reroutePoints = output.GetReroutePoints(k);
 
@@ -304,8 +305,6 @@ namespace XNodeEditor {
             //Save guiColor so we can revert it
             Color guiColor = GUI.color;
 
-            List<XNode.NodePort> removeEntries = new List<XNode.NodePort>();
-
             if (e.type == EventType.Layout) culledNodes = new List<XNode.Node>();
             for (int n = 0; n < graph.nodes.Count; n++) {
                 // Skip null nodes. The user could be in the process of renaming scripts, so removing them at this point is not advisable.
@@ -322,12 +321,6 @@ namespace XNodeEditor {
                     }
                 } else if (culledNodes.Contains(node)) continue;
 
-                if (e.type == EventType.Repaint) {
-                    removeEntries.Clear();
-                    foreach (var kvp in _portConnectionPoints)
-                        if (kvp.Key.node == node) removeEntries.Add(kvp.Key);
-                    foreach (var k in removeEntries) _portConnectionPoints.Remove(k);
-                }
 
                 NodeEditor nodeEditor = NodeEditor.GetEditor(node, this);
 
@@ -433,6 +426,9 @@ namespace XNodeEditor {
         }
 
         private bool ShouldBeCulled(XNode.Node node) {
+
+            if (!nodeSizes.ContainsKey(node))
+                return false;
 
             Vector2 nodePos = GridToWindowPositionNoClipped(node.position);
             if (nodePos.x / _zoom > position.width) return true; // Right

@@ -395,7 +395,7 @@ namespace XNodeEditor {
                 // Draw full connections and output > reroute
                 foreach (NodePort output in node.Outputs)
                 {
-                    if (!_portConnectionPoints.TryGetValue(output, out var fromRect))
+                    if (!portConnectionPoints.TryGetValue(output, out var fromRect))
                         continue;
 
                     for (int connectionIndex = 0; connectionIndex < output.ConnectionCount; connectionIndex++)
@@ -411,7 +411,7 @@ namespace XNodeEditor {
                         if (!input.IsConnectedTo(output))
                             input.Connect(output);
 
-                        if (!_portConnectionPoints.TryGetValue(input, out var toRect))
+                        if (!portConnectionPoints.TryGetValue(input, out var toRect))
                             continue;
 
                         List<Vector2> points = output.GetReroutePoints(connectionIndex);
@@ -544,8 +544,13 @@ namespace XNodeEditor {
             }
             selectedReroutes.Clear();
             foreach (UnityEngine.Object item in Selection.objects) {
-                if (item is XNode.Node) {
-                    XNode.Node node = item as XNode.Node;
+                if (item is XNode.Node node)
+                {
+                    foreach (var nodePort in node.Ports)
+                    {
+                        portConnectionLabelPoints.Remove(nodePort);
+                        portConnectionPoints.Remove(nodePort);
+                    }
                     graphEditor.RemoveNode(node);
                 }
             }
@@ -661,7 +666,7 @@ namespace XNodeEditor {
                 NoodleStroke stroke = graphEditor.GetNoodleStroke(draggedOutput, null);
 
                 Rect fromRect;
-                if (!_portConnectionPoints.TryGetValue(draggedOutput, out fromRect)) return;
+                if (!portConnectionPoints.TryGetValue(draggedOutput, out fromRect)) return;
                 List<Vector2> gridPoints = new List<Vector2>();
                 gridPoints.Add(fromRect.center);
                 for (int i = 0; i < draggedOutputReroutes.Count; i++) {
